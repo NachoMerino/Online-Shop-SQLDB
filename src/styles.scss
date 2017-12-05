@@ -1,0 +1,36 @@
+@import './custom-bootstrap';
+
+.card {
+  margin-top: $grid-gutter-width * 0.5;
+  margin-bottom: $grid-gutter-width * 0.5;
+}
+
+.shop- {
+  &carousel {
+    height: 50vh;
+    min-height: 200px;
+
+    &-description {
+      padding: $grid-gutter-width * 0.5;
+    }
+
+    &-description h2{
+      color: #fff;
+      text-align: center;
+    }
+  }
+}
+
+.carousel-item {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.infobox{
+  margin: 50px 20px;
+}
+
+.bg-light {
+    background-color: transparent !important;
+}

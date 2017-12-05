@@ -1,0 +1,174 @@
+[
+{
+  "id": 0,
+  "name": "Dell 1000",
+  "price": 500,
+  "category_id": 0,
+  "type": "Laptop"
+},
+{
+  "id": 1,
+  "name": "Dell 2000",
+  "price": 600,
+  "category_id": 0,
+  "highlight": true,
+  "type": "Laptop"
+},
+{
+  "id": 2,
+  "name": "Dell 3000",
+  "price": 700,
+  "category_id": 0,
+  "type": "Laptop"
+},
+{
+  "id": 3,
+  "name": "Dell 4000",
+  "price": 800,
+  "category_id": 0,
+  "type": "Laptop"
+},
+{
+  "id": 4,
+  "name": "HP Workstation 1",
+  "price": 350,
+  "category_id": 0,
+  "type": "PC"
+},
+{
+  "id": 5,
+  "name": "HP Workstation 2",
+  "price": 450,
+  "category_id": 0,
+  "type": "PC"
+},
+{
+  "id": 6,
+  "name": "HP Workstation 3",
+  "price": 550,
+  "category_id": 0,
+  "highlight": true,
+  "type": "PC"
+},
+{
+  "id": 7,
+  "name": "HP Workstation 4",
+  "price": 650,
+  "category_id": 0,
+  "type": "PC"
+},
+{
+  "id": 8,
+  "name": "HP Probook 1100",
+  "price": 450,
+  "category_id": 1,
+  "type": "Laptop"
+},
+{
+  "id": 9,
+  "name": "HP Probook 2100",
+  "price": 550,
+  "category_id": 1,
+  "highlight": true,
+  "type": "Laptop"
+},
+{
+  "id": 10,
+  "name": "HP Probook 3100",
+  "price": 650,
+  "category_id": 1,
+  "type": "Laptop"
+},
+{
+  "id": 11,
+  "name": "HP Probook 4100",
+  "price": 750,
+  "category_id": 1,
+  "type": "Laptop"
+},
+{
+  "id": 12,
+  "name": "Sony Vaio x1",
+  "price": 750,
+  "category_id": 1,
+  "highlight": true,
+  "type": "Laptop"
+},
+{
+  "id": 13,
+  "name": "Sony Vaio x2",
+  "price": 850,
+  "category_id": 1,
+  "type": "Laptop"
+},
+{
+  "id": 14,
+  "name": "Sony Vaio x3",
+  "price": 950,
+  "category_id": 1,
+  "type": "Laptop"
+},
+{
+  "id": 15,
+  "name": "Sony Vaio x4",
+  "price": 1050,
+  "category_id": 1,
+  "type": "Laptop"
+},
+{
+  "id": 16,
+  "name": "MacBook Pro 1",
+  "price": 1150,
+  "category_id": 2,
+  "type": "Mac"
+},
+{
+  "id": 17,
+  "name": "MacBook Pro 2",
+  "price": 1250,
+  "category_id": 2,
+  "highlight": true,
+  "type": "Mac"
+},
+{
+  "id": 18,
+  "name": "MacBook Pro 3",
+  "price": 1350,
+  "category_id": 2,
+  "type": "Mac"
+},
+{
+  "id": 19,
+  "name": "MacBook Pro 4",
+  "price": 1450,
+  "category_id": 2,
+  "type": "Mac"
+},
+{
+  "id": 20,
+  "name": "MacBook Pro 5",
+  "price": 1550,
+  "category_id": 2,
+  "type": "Mac"
+},
+{
+  "id": 21,
+  "name": "MacBook Pro 6",
+  "price": 1650,
+  "category_id": 2,
+  "type": "Mac"
+},
+{
+  "id": 22,
+  "name": "MacBook Pro 7",
+  "price": 1750,
+  "category_id": 2,
+  "type": "Mac"
+},
+{
+  "id": 23,
+  "name": "MacBook Pro 8",
+  "price": 1850,
+  "category_id": 2,
+  "type": "Mac"
+}]
