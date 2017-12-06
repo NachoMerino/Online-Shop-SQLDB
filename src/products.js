@@ -13,7 +13,8 @@ export function mkProductCard(product) {
   return $el;
 }
 //  filter and refresh the products
-export function refreshProducts(products, type) {
+export default function refreshProducts(products, type) {
+  $('#products-grid').empty();
   $('#products-grid').append('<div class="row"></div>');
   const cat = parseInt(type, 10);
   //  check if request all product
@@ -30,4 +31,11 @@ export function refreshProducts(products, type) {
       });
     $('#infos').text(`Total products (${Object.keys(products.filter(product => product.category_id === cat)).length})`);
   }
+  $('.detailsButton').click((eventObj) => {
+    console.log('wooop');
+    const { target } = eventObj;
+    $('.modal-title').text(`More info about ${target.getAttribute('data-name')}`);
+    $('.modal-body').text(`The price of this product is ${target.getAttribute('data-price')}`);
+    $('#detailsModal').modal('toggle');
+  });
 }

@@ -5,15 +5,12 @@ import './styles.scss';
 import navbarTemplate from './templates/navbar.html';
 import modalTemplate from './templates/modal.html';
 import mkCarousel from './carousel';
-import { mkProductCard, refreshProducts } from './products';
-
+import refreshProducts from './products';
 
 //  append navbar
 $(() => {
-  //  append modal window
-  $('#root').append(modalTemplate);
-  //  append navbar
-  $('#root').append(navbarTemplate);
+  $('#root').append(modalTemplate)
+    .append(navbarTemplate);
   //  read categories
   $.ajax('./static/categories.json')
     .done((categories) => {
@@ -43,23 +40,19 @@ $(() => {
       $('#root').append('<div id="products-grid" class="container-fluid"></div>');
       //  populate products-grid with products
       $('#products-grid').append('<div class="row"></div>');
-      products
-        .forEach((product) => {
-          $('.row').append(mkProductCard(product));
-        });
+      refreshProducts(products, '-1');
       // click event handler on nav-links
       $('.nav-link').click((eventObj) => {
         const { target } = eventObj;
         const linkName = target.getAttribute('data-id');
         //  clean the products-grid and update the content
-        $('#products-grid').empty();
         refreshProducts(products, linkName);
       });
-      $('.detailsButton').click((eventObj) => {
+      $('#detailsButton').click((eventObj) => {
+        console.log('wooop');
         const { target } = eventObj;
         $('.modal-title').text(`More info about ${target.getAttribute('data-name')}`);
         $('.modal-body').text(`The price of this product is ${target.getAttribute('data-price')}`);
-        //  console.log(target.getAttribute('data-price'));
       });
     })
     //  or fail trying
