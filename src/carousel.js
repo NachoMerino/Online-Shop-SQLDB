@@ -33,7 +33,7 @@ export default function mkCarousel(items) {
     }
     $indicators.append($indicator);
     $slides.append($slide);
-    $slide.css('background-image', `url(static/assets/images/${item.name}.jpg)`);
+    $slide.css('background-image', `url(static/assets/images/0${number}.jpg)`);
   });
   return $el;
 }
