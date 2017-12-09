@@ -21,13 +21,16 @@
   }
 }
 
+.carousel {
+  margin-top: 55px;
+}
 .carousel-item {
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
 }
 
-.infobox{
+.infobox {
   margin: 50px 20px;
 }
 
@@ -35,6 +38,15 @@
     background-color: transparent !important;
 }
 
-.modal-lorem {
+.modal-lorem, .modal-total {
   margin: 20px;
+}
+
+.modal-content img {
+  margin: 10px auto;
+  max-width:80%;
+}
+
+.shopping-cart {
+
 }

@@ -9,6 +9,7 @@ export function mkProductCard(product) {
   $el.find('.card-text').text(`Price: ${product.price}€`);
   $el.find('.card-img-top').attr('src', `./static/assets/images/0${product.category_id}.jpg`);
   $el.find('.detailsButton').attr('data-name', `${product.name}`);
+  $el.find('.detailsButton').attr('data-id', `${product.category_id}`);
   $el.find('.detailsButton').attr('data-price', `${product.price}`);
   return $el;
 }
@@ -18,7 +19,7 @@ export default function refreshProducts(products, type) {
   $('#products-grid').append('<div class="row"></div>');
   const cat = parseInt(type, 10);
   //  check if request all product
-  if (type === '-1') {
+  if (cat === -1) {
     products.forEach((product) => {
       $('.row').append(mkProductCard(product));
     });
@@ -29,13 +30,16 @@ export default function refreshProducts(products, type) {
       .forEach((product) => {
         $('.row').append(mkProductCard(product));
       });
-    $('#infos').text(`Total products (${Object.keys(products.filter(product => product.category_id === cat)).length})`);
+    const activeCategory = $('.navbar-nav .active').text();
+    console.log(activeCategory);
+    $('#infos').text(`Total products in ${activeCategory} (${Object.keys(products.filter(product => product.category_id === cat)).length})`);
   }
   $('.detailsButton').click((eventObj) => {
-    console.log('wooop');
     const { target } = eventObj;
     $('.modal-title').text(`More info about ${target.getAttribute('data-name')}`);
-    $('.modal-body').text(`The price of this product is ${target.getAttribute('data-price')}`);
+    $('.modal-image').attr('src', `./static/assets/images/0${target.getAttribute('data-id')}.jpg`);
+    $('.modal-body').text(`The price of this product is € ${target.getAttribute('data-price')}`);
+    $('.modal-total').text(`Total 1x ${target.getAttribute('data-name')} is € ${target.getAttribute('data-price')}`);
     $('#detailsModal').modal('toggle');
   });
 }

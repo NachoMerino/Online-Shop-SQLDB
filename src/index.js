@@ -26,6 +26,7 @@ $(() => {
             <a class="nav-link" data-id="${number}" data-name="${category.name}" href="#">${category.name}</a>
             </li>`);
       });
+      $('.navbar-nav').append('<span class="glyphicon glyphicon-shopping-cart"></span>');
     })
     //  or fail trying
     .fail((xhr, status, error) => {
@@ -45,20 +46,29 @@ $(() => {
       $('.nav-link').click((eventObj) => {
         const { target } = eventObj;
         const linkName = target.getAttribute('data-id');
+        $('.navbar-nav .active').removeClass('active');
+        $(target).closest('li').addClass('active');
         //  clean the products-grid and update the content
         refreshProducts(products, linkName);
-      });
-      $('#detailsButton').click((eventObj) => {
-        console.log('wooop');
-        const { target } = eventObj;
-        $('.modal-title').text(`More info about ${target.getAttribute('data-name')}`);
-        $('.modal-body').text(`The price of this product is ${target.getAttribute('data-price')}`);
       });
     })
     //  or fail trying
     .fail((xhr, status, error) => {
       $('#root').append(`<div>Ajax Error products: ${error}</div>`);
     });
+  $('.addCart').click(() => {
+    //  localStorage.clear();
 
+    if (localStorage.getItem('total') === null) {
+      console.log('empty');
+      const total = 1;
+      localStorage.setItem('total', total);
+    } else {
+      const total = parseInt(localStorage.getItem('total'), 10);
+      localStorage.setItem('total', total + 1);
+    }
+    console.log('Add to cart');
+    console.log(localStorage.getItem('total'));
+  });
   // End
 });
