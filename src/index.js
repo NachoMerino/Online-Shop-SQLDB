@@ -11,6 +11,11 @@ import refreshProducts from './products';
 $(() => {
   $('#root').append(modalTemplate)
     .append(navbarTemplate);
+  $('#cart').click((() => {
+    $('.shopping-cart').toggle('fast', (() => {
+      console.log('opp');
+    }));
+  }));
   //  read categories
   $.ajax('./static/categories.json')
     .done((categories) => {
@@ -26,7 +31,6 @@ $(() => {
             <a class="nav-link" data-id="${number}" data-name="${category.name}" href="#">${category.name}</a>
             </li>`);
       });
-      $('.navbar-nav').append('<span class="glyphicon glyphicon-shopping-cart"></span>');
     })
     //  or fail trying
     .fail((xhr, status, error) => {
@@ -56,19 +60,5 @@ $(() => {
     .fail((xhr, status, error) => {
       $('#root').append(`<div>Ajax Error products: ${error}</div>`);
     });
-  $('.addCart').click(() => {
-    //  localStorage.clear();
-
-    if (localStorage.getItem('total') === null) {
-      console.log('empty');
-      const total = 1;
-      localStorage.setItem('total', total);
-    } else {
-      const total = parseInt(localStorage.getItem('total'), 10);
-      localStorage.setItem('total', total + 1);
-    }
-    console.log('Add to cart');
-    console.log(localStorage.getItem('total'));
-  });
   // End
 });

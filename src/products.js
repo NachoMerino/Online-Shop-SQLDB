@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import Cart from './cart';
 import cardTemplate from './templates/card-template.html';
 
 //  create product box in grid
@@ -9,12 +10,16 @@ export function mkProductCard(product) {
   $el.find('.card-text').text(`Price: ${product.price}€`);
   $el.find('.card-img-top').attr('src', `./static/assets/images/0${product.category_id}.jpg`);
   $el.find('.detailsButton').attr('data-name', `${product.name}`);
-  $el.find('.detailsButton').attr('data-id', `${product.category_id}`);
+  $el.find('.detailsButton').attr('data-id', `${product.id}`);
+  $el.find('.detailsButton').attr('data-catid', `${product.category_id}`);
   $el.find('.detailsButton').attr('data-price', `${product.price}`);
   return $el;
 }
 //  filter and refresh the products
 export default function refreshProducts(products, type) {
+  const cart = new Cart();
+  //  cart.clear();
+  cart.updateBadge();
   $('#products-grid').empty();
   $('#products-grid').append('<div class="row"></div>');
   const cat = parseInt(type, 10);
@@ -34,12 +39,27 @@ export default function refreshProducts(products, type) {
     console.log(activeCategory);
     $('#infos').text(`Total products in ${activeCategory} (${Object.keys(products.filter(product => product.category_id === cat)).length})`);
   }
+  //  detail button
   $('.detailsButton').click((eventObj) => {
+    // define obj
     const { target } = eventObj;
+    //  replace text with jquery retriving data from dom
     $('.modal-title').text(`More info about ${target.getAttribute('data-name')}`);
-    $('.modal-image').attr('src', `./static/assets/images/0${target.getAttribute('data-id')}.jpg`);
+    $('.modal-image').attr('src', `./static/assets/images/0${target.getAttribute('data-catid')}.jpg`);
     $('.modal-body').text(`The price of this product is € ${target.getAttribute('data-price')}`);
-    $('.modal-total').text(`Total 1x ${target.getAttribute('data-name')} is € ${target.getAttribute('data-price')}`);
+    $('.modal-total').text(`Total 1x ${target.getAttribute('data-name')} is € ${target.getAttribute('data-price')} (Prod. id: ${target.getAttribute('data-id')})`);
     $('#detailsModal').modal('toggle');
+  });
+  //  add to cart
+  $('.addCart').click((eventObj) => {
+    //  define obj
+    const { target } = eventObj;
+    //  define product obj and retriving data using jquery
+    const product = {};
+    product.id = $(target).parent().find('#detailsButton').attr('data-id');
+    product.name = $(target).parent().find('#detailsButton').attr('data-name');
+    product.price = $(target).parent().find('#detailsButton').attr('data-price');
+    //  add product to cart
+    cart.addItem(product);
   });
 }
