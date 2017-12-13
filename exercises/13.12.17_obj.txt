@@ -2,38 +2,50 @@
  exercise 13.12.17
 -------------------
 
-+ We want to add a new data element to the modal trigger button "Details"
-+ We want to move the "Add to Cart" button on main page
 + We want to implement shopping cart functionalities using localStorage
 
+--------------
+ Preparation
+--------------
 
----------
- Prepare
----------
+- copy the style.scss or implement from line 60
 
 - is your navbar fixed?
 
+=> .fixed-top
+=> copy the <div class="right"> and <div class="shopping-cart"> container
+
 - in Product.js mkProductCard you should add some more data attributes:
 
-$el.find('.detailsButton').attr('data-id', `${product.id}`);
-$el.find('.detailsButton').attr('data-catid', `${product.category_id}`);
+=> $el.find('.detailsButton').attr('data-id', `${product.id}`);
+=> $el.find('.detailsButton').attr('data-catid', `${product.category_id}`);
 
 - in $('.detailsButton').click((eventObj) output the Product Id 
 
 i.e. print somewhere (Prod. id: ${target.getAttribute('data-id')})`);
 
+=> $el.find('.detailsButton').attr('data-id', `${product.id}`);
+
 - remove the "add to cart" button and put it in main view near "Details"
+
+=> in template/card-template.html
+<button type="button" class="btn btn-info addCart">Add to Cart</button>
 
 - in product.js create ('.addCart').click((eventObj)
 
-=> when the "Add to Cart" is triggered the product is add
+$('.addCart').click((eventObj) => {
+  //  define obj
+  const { target } = eventObj;
+  //  define product obj and retriving data using jquery
+  const product = {};
+  product.id = $(target).parent().find('#detailsButton').attr('data-id');
+  ... for all your data-elements: .catid .name .price .quantity
 
 ----------------
  Project on Git
 ----------------
 
 https://github.com/LeoDvg/neutrino-bootstrap-shop.git
-
 
 ----------------
   Todo List
@@ -65,5 +77,6 @@ localStorage.clear();
 ==> Click events
 
 - toggle the cart products list
-- add/remove items in cart
+- when the "Add to Cart" is triggered the product is add
+- remove products from cart
 - avoid duplicates (or handle them)
