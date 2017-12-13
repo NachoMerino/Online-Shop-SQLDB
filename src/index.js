@@ -13,7 +13,7 @@ $(() => {
     .append(navbarTemplate);
   $('#cart').click(((e) => {
     e.preventDefault();
-    $('.shopping-cart').toggle('fast', (() => {
+    $('.shopping-cart').toggle('slow', (() => {
     }));
   }));
   //  read categories

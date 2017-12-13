@@ -19,7 +19,7 @@ export function mkProductCard(product) {
 export default function refreshProducts(products, type) {
   const cart = new Cart();
   // used to force clean during development
-  //  cart.clear();
+  cart.clear();
   cart.update();
   $('#products-grid').empty();
   $('#products-grid').append('<div class="row"></div>');
@@ -63,7 +63,7 @@ export default function refreshProducts(products, type) {
     product.price = $(target).parent().find('#detailsButton').attr('data-price');
     product.quantity = 1;
     //  workaround duplication
-    $(target).attr('disabled', true);
+    //  $(target).attr('disabled', true);
     //  add product to cart
     cart.addItem(product);
   });
