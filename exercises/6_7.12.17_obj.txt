@@ -1,0 +1,159 @@
+-------------------
+WEDNESDAY 6.12.2017
+-------------------
+
+GIT
+https://github.com/LeoDvg/neutrino-bootstrap-shop.git
+
+
+GOAL AND OBJECTIVES
+Implement new functionalities on the shop-app built with Neutrino
+
++ USE JQUERY FILTER
+http://api.jquery.com/filter/
+
+es:
+products.filter(product => product.highlight).forEach((product) => { ... });
+
++ USE EVENT HANDLER .CLICK
+http://api.jquery.com/click/
+
+$('.nav-link').click((eventObj) => {
+  const { target } = eventObj;
+  const linkName = target.getAttribute('data-name'); //expected to be a nav-link attr
+  console.log(linkName);
+});
+
+
+TODO LIST:
+
++ NAVBAR: add links to navigation menu and filter the products
+
+- 1: In index.js add data-id and data-name attribute to the links. It should be:
+
+<a class="nav-link" data-id="${number}" data-name="${category.name}" href="#">${category.name}</a>
+
+- 2: In index.js add an event handler for the nav-links
+
+$('.nav-link').click((eventObj) => {
+  const { target } = eventObj;
+  const linkName = target.getAttribute('data-name');
+  //  clean the products-grid and update the content
+  $('#products-grid').empty();
+  refreshProducts(products, linkName);
+});
+
+- 3: in products.js add the new functions refeshProducts to products.js and import it
+
+export function refreshProducts(products, type) {
+  $('#products-grid').append('<div class="row"></div>');
+  //  check if request all product
+  if (type === 'All') {
+    products.forEach((product) => {
+      $('.row').append(mkProductCard(product));
+    });
+    $('#infos').text(`${type} products (${Object.keys(products).length})`);
+  } else {
+    //  request only one product
+    products.filter(product => product.type === type)
+      .forEach((product) => {
+        $('.row').append(mkProductCard(product));
+      });
+    $('#infos').text(`${type} products (${Object.keys(products.filter(product => product.type === type)).length})`);
+  }
+}
+
+- 4: remove default from the mkProductCard function (useless now!)
+
+- 5: populate the #infobox counting the filtered products, like:
+
+$('#root').append(`<div class="infobox"><h2 id="infos">All products (${Object.keys(products).length})</h2></div>`);
+
+
++ MODAL DETAILS
+
+- 1: create template for the modal window (there is no // TODO for that!)
+- 2: import the modal template
+- 3: append the template to #root
+- 4: in mkProductCard function 
+
+$el.find('.detailsButton').attr('data-name', `${product.name}`);
+$el.find('.detailsButton').attr('data-price', `${product.price}`);
+
+- 5: in card-template.html add data attributes for the modal window
+
+<button type="button" class="btn btn-primary detailsButton" data-name="" data-price="" data-toggle="modal" data-target="#detailsModal">Details</a>
+
+- 6: add an event handler for the detailsButton
+
+
+BONUS:
+
+- add .fail callback to ajax methods 
+
+
+
+
+
+-------------------
+THURSDAY 7.12.2017
+-------------------
+
+GOAL AND OBJECTIVES
+Fix the and implement the shop-app
+
++ Fix the bug!
+  Bug:
+  => After the Navigation menu is triggered and products are filtered the details windows is not updated.
+  [?] Why/Where is happening?
+  [?] How to fix it?
+
+  "Use console.log() to detect"
+
++ In navbar make active the selected category using jQuery
+  "add the .active to the nav-item and remove it if changes: use i.e. addClass(), closest() or parent()
+
+  $('.navbar-nav .active').removeClass('active');
+  $(target).closest('li').addClass('active');
+
++ Add the name of the category in #infos 
+  "Total products in Mac (8)"
+
+  const activeCategory = $('.navbar-nav .active').text();
+  console.log(activeCategory);
+  $('#infos').text(`Total products in ${activeCategory} (${Object.keys(products.filter(product => product.category_id === cat)).length})`);
+
++ Add search in nav
+  "Bootstrap doc is your friend"
+
++ Get rid of $type use category_id from the products.json
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

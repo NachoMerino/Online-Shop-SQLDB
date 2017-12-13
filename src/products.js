@@ -18,8 +18,9 @@ export function mkProductCard(product) {
 //  filter and refresh the products
 export default function refreshProducts(products, type) {
   const cart = new Cart();
+  // used to force clean during development
   //  cart.clear();
-  cart.updateBadge();
+  cart.update();
   $('#products-grid').empty();
   $('#products-grid').append('<div class="row"></div>');
   const cat = parseInt(type, 10);
@@ -36,7 +37,7 @@ export default function refreshProducts(products, type) {
         $('.row').append(mkProductCard(product));
       });
     const activeCategory = $('.navbar-nav .active').text();
-    console.log(activeCategory);
+    //  console.log(activeCategory);
     $('#infos').text(`Total products in ${activeCategory} (${Object.keys(products.filter(product => product.category_id === cat)).length})`);
   }
   //  detail button
@@ -57,9 +58,16 @@ export default function refreshProducts(products, type) {
     //  define product obj and retriving data using jquery
     const product = {};
     product.id = $(target).parent().find('#detailsButton').attr('data-id');
+    product.catid = $(target).parent().find('#detailsButton').attr('data-catid');
     product.name = $(target).parent().find('#detailsButton').attr('data-name');
     product.price = $(target).parent().find('#detailsButton').attr('data-price');
+    product.quantity = 1;
+    //  workaround duplication
+    $(target).attr('disabled', true);
     //  add product to cart
     cart.addItem(product);
+  });
+  $('.emptyCart').click(() => {
+    cart.clear();
   });
 }

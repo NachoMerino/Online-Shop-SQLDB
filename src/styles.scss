@@ -115,10 +115,12 @@ nav {
 }
 
 .shopping-cart {
-  position:absolute;
+  position: fixed!important;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 10px 16px 0px, rgba(0, 0, 0, 0.19) 0px 6px 20px 0px;
   z-index:10;
   margin: 20px 0;
-  float: right;
+  right:10px;
+  top:50px;
   background: white;
   width: 380px;
   position: relative;
@@ -135,12 +137,17 @@ nav {
     }
   }
   
+  .removeItem {
+    margin: 15px;
+  }
+
   .shopping-cart-items {
     
-    padding-top: 20px;
+    padding: 20px 0;
 
       li {
         margin-bottom: 18px;
+        list-style-type: none;
       }
 
     img {
@@ -209,6 +216,10 @@ nav {
   clear: both;
 }
 
+.cart-img {
+  max-width:100px;
+  max-height:auto;
+}
 
 
   

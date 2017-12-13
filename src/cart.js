@@ -1,56 +1,69 @@
 import $ from 'jquery';
 
 class Cart {
-  constructor(products) {
+  constructor() {
     $('.shopping-cart').hide();
-    if (window.localStorage) {
-      // localStorage can be used
-      console.log('ok proceed');
-    } else {
-      // can't be used
-      console.log('browser do not support localstorage');
-    }
-    this.products = products;
+    this.cart = {};
+    this.cart.products = [];
   }
 
   addItem(product) {
-    this.product = product;
-    console.log(product);
-    //  localStorage.clear();
-
+    //  check if cart exists using total
     if (localStorage.getItem('total') === null) {
-      console.log('cart was empty');
-      const total = 1;
-      localStorage.setItem('total', total);
+      //  cart is empty - add first product
+      localStorage.setItem('total', 1);
     } else {
-      console.log('cart was not empty');
+      //  cart exists - retrive it and prepare to add
       const total = parseInt(localStorage.getItem('total'), 10);
       localStorage.setItem('total', total + 1);
+      //  TODO: retrieve stored products
     }
-    console.log(localStorage.getItem('total'));
-    $('.badge').text(localStorage.getItem('total'));
-    return this.product;
-  }
-
-  removeItem(product) {
-    this.product = product;
+    // TODO: add products to cart
     console.log(product);
-    return this.product;
+
+    $('.badge').text(localStorage.getItem('total'));
+    $('.shopping-cart').show();
+    return this.update();
   }
 
-  updateBadge() {
+  removeItem(id) {
+    //  check what is in cart exists using total
+    const total = parseInt(localStorage.getItem('total'), 10);
+    localStorage.setItem('total', total - 1);
+    //  TODO: retrieve stored products
+    console.log(id);
+    return this.update();
+  }
+
+  update() {
+    //  update badge and show/hide cart container
     if (localStorage.getItem('total') === null) {
       $('.badge').text(0);
       $('.badge').hide();
+      $('.shopping-cart').hide();
+      $('.cart').hide();
     } else {
       $('.badge').text(localStorage.getItem('total'));
       $('.badge').show();
+      $('.cart').show();
+      // updating items in cart
+      $('.shopping-cart-items').empty();
+      //  TODO: update the items list here...
     }
+    $('.removeItemButton').click((eventObj) => {
+      //  console.log('removing');
+      //  define obj
+      const { target } = eventObj;
+      //  chrome / ff see different things!
+      //  define product obj and retriving data using jquery
+      this.removeItem($(target).parent().closest('.removeItemButton').attr('data-id'));
+    });
     return this;
   }
-
   clear() {
     localStorage.clear();
+    // TODO: empty this.cart.products
+    this.update();
     return this;
   }
 }

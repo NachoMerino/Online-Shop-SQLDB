@@ -11,9 +11,9 @@ import refreshProducts from './products';
 $(() => {
   $('#root').append(modalTemplate)
     .append(navbarTemplate);
-  $('#cart').click((() => {
+  $('#cart').click(((e) => {
+    e.preventDefault();
     $('.shopping-cart').toggle('fast', (() => {
-      console.log('opp');
     }));
   }));
   //  read categories
@@ -48,6 +48,7 @@ $(() => {
       refreshProducts(products, '-1');
       // click event handler on nav-links
       $('.nav-link').click((eventObj) => {
+        eventObj.preventDefault();
         const { target } = eventObj;
         const linkName = target.getAttribute('data-id');
         $('.navbar-nav .active').removeClass('active');

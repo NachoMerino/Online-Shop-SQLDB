@@ -1,0 +1,69 @@
+-------------------
+ exercise 13.12.17
+-------------------
+
++ We want to add a new data element to the modal trigger button "Details"
++ We want to move the "Add to Cart" button on main page
++ We want to implement shopping cart functionalities using localStorage
+
+
+---------
+ Prepare
+---------
+
+- is your navbar fixed?
+
+- in Product.js mkProductCard you should add some more data attributes:
+
+$el.find('.detailsButton').attr('data-id', `${product.id}`);
+$el.find('.detailsButton').attr('data-catid', `${product.category_id}`);
+
+- in $('.detailsButton').click((eventObj) output the Product Id 
+
+i.e. print somewhere (Prod. id: ${target.getAttribute('data-id')})`);
+
+- remove the "add to cart" button and put it in main view near "Details"
+
+- in product.js create ('.addCart').click((eventObj)
+
+=> when the "Add to Cart" is triggered the product is add
+
+----------------
+ Project on Git
+----------------
+
+https://github.com/LeoDvg/neutrino-bootstrap-shop.git
+
+
+----------------
+  Todo List
+----------------
+
+==> Create cart class as cart.js and import it (products.js)
+
+import Cart from './cart';
+
+==> Add constructor and define
+
+this.cart = {};
+this.cart.products = [];
+
+==> Add at least the methods to:
+
+- Add items
+- Remove items
+- Update cart products list
+- Remove all
+
+==> You should use:
+
+localStorage.setItem('key', 'value');
+localStorage.getItem('key');
+localStorage.removeItem('key');
+localStorage.clear();
+
+==> Click events
+
+- toggle the cart products list
+- add/remove items in cart
+- avoid duplicates (or handle them)
