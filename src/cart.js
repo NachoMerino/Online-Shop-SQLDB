@@ -2,20 +2,20 @@ import $ from 'jquery';
 
 class Cart {
   constructor() {
-    $('.shopping-cart').hide();
     this.cart = {};
     this.cart.products = [];
   }
 
   addItem(product) {
     //  check if cart exists using total
-    if (localStorage.getItem('total') === null) {
+    let total = Object.keys(this.cart.products).length;
+    if (total === 0) {
       //  cart is empty - add first product
-      localStorage.setItem('total', 1);
+      total += 1;
     } else {
       //  cart exists - retrive it and prepare to add
-      const total = Object.keys(this.cart.products).length;
-      localStorage.setItem('total', total + 1);
+      // total = Object.keys(this.cart.products).length;
+      total += 1;
       const storedProducts = JSON.parse(localStorage.getItem('cart'));
       this.cart.products = storedProducts;
       //  check if the product is already in the cart
@@ -34,9 +34,6 @@ class Cart {
   }
 
   removeItem(id) {
-    //  check what is in cart exists using total
-    const total = parseInt(localStorage.getItem('total'), 10);
-    localStorage.setItem('total', total - 1);
     //  retrieve stored products
     const storedProducts = JSON.parse(localStorage.getItem('cart'));
     this.cart.products = storedProducts.filter(product => product.id !== id);

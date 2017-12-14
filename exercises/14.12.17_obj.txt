@@ -1,0 +1,106 @@
+-------------------
+ exercise 13.12.17
+-------------------
+
+Implement the shopping cart functionalities, the clean code and add purchase in larger quantities
+
+----------------
+ Project on Git
+----------------
+
+https://github.com/LeoDvg/neutrino-bootstrap-shop.git
+
+----------------
+  Todo List
+----------------
+
++ Get rid of localStorage "total", we want to have only "cart" json array
+
+-> remove ev. localStorage('total')
+-> this.cart.products 
+-> let total = Object.keys(this.cart.products).length
+    total += 1;
+    total -= 1;
+    https://eslint.org/docs/rules/operator-assignment
+
+
++ Improve cart functionalities: the customer should be able to:
+
+-> create a cart with the products that want to buy
+-> add single items in cart
+-> add the same product again and increment the quantity and total accordingly
+-> add different product and increment the quantity
+
+
+Cart.js about line 21
+-> check if product -> addItem(product) is already in cart
+-> compare product with storedProduct
+
+
+you want to check it inside the ELSE -> about line 21
+$.map(this.cart.products, ((SINGLEPRODUCT_FROM_GLOBAL_OBJ) => {
+if statement to check if SINGLE_PRODUCT_FROM_GLOBAL_OBJ is like product 
+ console.log('already in cart!')
+ ...
+
+in the update method do the math to count the quantity and price
+
+ totalQuantity += parseInt(product.quantity, 10);
+ totalPrice += parseInt(product.price, 10) * parseInt(product.quantity, 10);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
++ Implement "More quantity function"
+
+addItem 22
+
+$.map(this.cart.products, ((storedProduct) => {
+  if (storedProduct.id === product.id) {
+    this.removeItem(product.id);
+    console.log('doubledare');
+    // eslint-disable-next-line no-param-reassign
+    product.quantity = storedProduct.quantity + 1;
+  }
+}));
+
+update 61
+
+$('.shopping-cart-items').empty();
+const storedProducts = this.cart.products;
+let totalPrice = 0;
+let totalQuantity = 0;
+storedProducts.forEach((product) => {
+  totalQuantity += parseInt(product.quantity, 10);
+  totalPrice += parseInt(product.price, 10) * parseInt(product.quantity, 10);
+ $('.badge').text(product.quantity);
+  $('.shopping-cart-items').append(`
