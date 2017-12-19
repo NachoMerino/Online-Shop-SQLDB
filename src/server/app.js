@@ -3,8 +3,10 @@ const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
 const mysql = require('mysql');
+const bodyParser = require('body-parser');
 const app = express();
 const Router = express.Router;
+
 
 const port = 9090;
 
@@ -18,6 +20,7 @@ const con = mysql.createConnection({
 const frontendDirectoryPath = path.resolve(__dirname, './../static');
 
 console.info('Static resource on: ', frontendDirectoryPath);
+app.use(bodyParser.json());
 
 app.use(express.static(frontendDirectoryPath));
 // CORS on ExpressJS to go over the port limitations on the same machine
@@ -73,7 +76,7 @@ apiRouter.get('/activecustomers', (req, res) => {
 
 
 apiRouter.get('/customers/:userid', (req, res) => {
-  con.query('select * from customers where active = 1 and id = ?',[req.params.userid], (err, rows) => {
+  con.query('select * from customers where active = 1 and id = ?', [req.params.userid], (err, rows) => {
     if (err) {
       throw err;
     } else {
@@ -121,6 +124,32 @@ apiRouter.post('/user', (req, res) => {
     });
 });
 
+apiRouter.post('/order', (req, res) => {
+  /*
+  fs.writeFile(path.resolve(__dirname, './../../orders/orders'+Date.now()+'.txt'), JSON.stringify(req.body),
+    (err)=>{
+      if(err)
+        res.json({error: err});
+      res.json({success:'order saved'})
+    });
+    */
+  con.query('INSERT INTO orders (customer_id,created,payment_method_id) VALUES (?,now(),?)', [req.body.customer_id, req.body.payment_method_id],
+    (err, rows) => {
+      if (err) {
+        throw err;
+      } else {
+        con.query('INSERT INTO order_details (order_id,product_id,price) VALUES (' + rows.insertId + ',?,?)', [req.body.product_id, req.body.price],
+          (err, rows) => {
+            if (err) {
+              throw err;
+            } else {
+              res.json(rows);
+            }
+          });
+      }
+    });
+});
+
 // modifyUser.sh
 apiRouter.put('/user/:userid', (req, res) => {
   var sql = 'UPDATE customers set ';
@@ -128,9 +157,9 @@ apiRouter.put('/user/:userid', (req, res) => {
   var i = 1;
   var bodyLength = Object.keys(req.body).length;
   var values = [];
-  for (var field in req.body) { 
+  for (var field in req.body) {
     sql += field + ' = ?';
-    if(i < bodyLength)
+    if (i < bodyLength)
       sql += ',';
     i++;
     values.push(req.body[field]);

@@ -67,9 +67,9 @@ $(() => {
   function accessUserInfo(user) {
     const getUserDataLS = JSON.parse(localStorage.getItem(user));
     console.info('MY LS DATA', getUserDataLS);
-    console.info('My Random user firstname: ', getUserDataLS.firstname);
-    console.info('My Random user lastname: ', getUserDataLS.lastname);
-    console.info('My Random user email: ', getUserDataLS.email);
+    // console.info('My Random user firstname: ', getUserDataLS.firstname);
+    // console.info('My Random user lastname: ', getUserDataLS.lastname);
+    // console.info('My Random user email: ', getUserDataLS.email);
   }
 
   // Select an active user by his id and storage the data as an object in the localStorage
@@ -77,6 +77,7 @@ $(() => {
     $.ajax(`http://localhost:9090/api/customers/${id}`)
       .done((user) => {
         const userInfo = {
+          id: user[0].id,
           firstname: user[0].firstname,
           lastname: user[0].lastname,
           email: user[0].email,
