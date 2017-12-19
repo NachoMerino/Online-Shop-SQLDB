@@ -8,7 +8,9 @@
     "build": "neutrino build",
     "start": "neutrino start",
     "start-express": "node src/server/app.js",
-    "start-express-dev": "nodemon src/server/app.js"
+    "start-express-dev": "nodemon src/server/app.js",
+    "dump-database": "mysqldump -unacho -p online_shop > ./database/online_shop.sql",
+    "import-database": "mysql -unacho -p online_shop < ./database/online_shop.sql"
   },
   "repository": {
     "type": "git",
