@@ -17,7 +17,7 @@ $(() => {
     }));
   }));
   //  read categories
-  $.ajax('./static/categories.json')
+  $.ajax('http://localhost:9090/api/categories')
     .done((categories) => {
       //  populate carousel with categories
       const $carousel = mkCarousel(categories);
@@ -38,7 +38,7 @@ $(() => {
     });
 
   //  ajax req and append products grid
-  $.ajax('./static/products.json')
+  $.ajax('http://localhost:9090/api/products')
     .done((products) => {
       //  append products-grid after carousel
       $('#root').append(`<div class="infobox"><h2 id="infos">All products (${Object.keys(products).length})</h2></div>`);
