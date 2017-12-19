@@ -13,8 +13,7 @@ $(() => {
     .append(navbarTemplate);
   $('#cart').click(((e) => {
     e.preventDefault();
-    $('.shopping-cart').toggle('slow', (() => {
-    }));
+    $('.shopping-cart').toggle('slow', (() => {}));
   }));
   //  read categories
   $.ajax('http://localhost:9090/api/categories')
@@ -61,5 +60,53 @@ $(() => {
     .fail((xhr, status, error) => {
       $('#root').append(`<div>Ajax Error products: ${error}</div>`);
     });
+
+  // Add a random active user ID
+
+  // Load the data storaged in the LocalStorage
+  function accessUserInfo(user) {
+    const getUserDataLS = JSON.parse(localStorage.getItem(user));
+    console.info('MY LS DATA', getUserDataLS);
+    console.info('My Random user firstname: ', getUserDataLS.firstname);
+    console.info('My Random user lastname: ', getUserDataLS.lastname);
+    console.info('My Random user email: ', getUserDataLS.email);
+  }
+
+  // Select an active user by his id and storage the data as an object in the localStorage
+  function selectActiveUser(id) {
+    $.ajax(`http://localhost:9090/api/customers/${id}`)
+      .done((user) => {
+        const userInfo = {
+          firstname: user[0].firstname,
+          lastname: user[0].lastname,
+          email: user[0].email,
+          phone: user[0].phone,
+          city: user[0].city,
+          postal: user[0].postal,
+          street: user[0].street,
+        };
+        localStorage.setItem('User', JSON.stringify(userInfo));
+        accessUserInfo('User');
+      });
+  }
+
+  // make a query for all the active users in our shop
+  $.ajax('http://localhost:9090/api/activecustomers')
+    .done((userIDs) => {
+      const arrayIDs = [];
+      userIDs.forEach((id) => {
+        arrayIDs.push(id);
+      });
+      const activeUserID = [];
+      for (let i = 0; i < arrayIDs.length; i += 1) {
+        activeUserID.push(arrayIDs[i].id);
+      }
+      const max = activeUserID.length - 1;
+      const userID = Math.floor(Math.random() * max);
+      // selected one user with a random math of its id
+      selectActiveUser(activeUserID[userID]);
+    });
+
+  localStorage.removeItem('User');
   // End
 });

@@ -38,7 +38,7 @@ apiRouter.get('/', (req, res) => {
   res.send({ 'shop-api': '1.0' });
 });
 
-///MySQL START
+///Conect to MySQL
 apiRouter.get('/products', (req, res) => {
   con.query('select * from products', (err, rows) => {
     if (err) {
@@ -61,26 +61,102 @@ apiRouter.get('/categories', (req, res) => {
   });
 });
 ///MySQL END
-/*Old fashion way
-apiRouter.get('/products', (req, res) => {
-  fs.readFile(frontendDirectoryPath + '/products.json',
-    (err, content) => {
-      if (err) throw err;
-      res.type('json');
-      res.send(content);
+apiRouter.get('/activecustomers', (req, res) => {
+  con.query('select id from customers where active = 1 ', (err, rows) => {
+    if (err) {
+      throw err;
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+
+apiRouter.get('/customers/:userid', (req, res) => {
+  con.query('select * from customers where active = 1 and id = ?',[req.params.userid], (err, rows) => {
+    if (err) {
+      throw err;
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+apiRouter.put('/activate/:userid', (req, res) => {
+  con.query('UPDATE customers set active = ? where id = ?', [req.body.status, req.params.userid],
+    (err, rows) => {
+      if (err)
+        throw err;
+      res.json(rows);
     });
 });
 
-apiRouter.get('/categories', (req, res) => {
-  fs.readFile(frontendDirectoryPath + '/categories.json',
-    (err, content) => {
-      if (err) throw err;
-      res.type('json');
-      res.send(content);
+// postUser.sh
+apiRouter.post('/user', (req, res) => {
+
+  con.query('select email from customers where email = ?', [req.body.email],
+    function(err, rows) {
+      if (err)
+        throw res.json();
+      if (rows.length > 0) {
+        res.json('The email ' + [req.body.email] + ' its already in use.');
+      } else {
+        con.query('INSERT INTO customers (firstname,lastname,birthdate,phone,city,street,postal,email) VALUES (?,?,?,?,?,?,?,?)', [req.body.firstname,
+            req.body.lastname,
+            req.body.birthdate,
+            req.body.phone,
+            req.body.city,
+            req.body.street,
+            req.body.postal,
+            req.body.email
+          ],
+          (err, rows) => {
+            if (err) {
+              throw err;
+            } else {
+              res.json(rows);
+            }
+          });
+      }
     });
 });
-*/
-app.get("*", (req, res) => {
+
+// modifyUser.sh
+apiRouter.put('/user/:userid', (req, res) => {
+  var sql = 'UPDATE customers set ';
+  // console.info('user id: ', req.params.userid);
+  var i = 1;
+  var bodyLength = Object.keys(req.body).length;
+  var values = [];
+  for (var field in req.body) { 
+    sql += field + ' = ?';
+    if(i < bodyLength)
+      sql += ',';
+    i++;
+    values.push(req.body[field]);
+    // console.info('field is:',field);
+    // console.info('value is:',req.body[field]);
+  }
+  sql += 'where id = ?';
+  values.push(req.params.userid);
+  con.query(sql, values,
+    (err, rows) => {
+      if (err)
+        throw err;
+      res.json(rows);
+    });
+});
+
+apiRouter.delete('/delete/:userid', (req, res) => {
+  con.query('UPDATE customers set deleted = now() where id = ?', [req.params.userid],
+    (err, rows) => {
+      if (err)
+        throw err;
+      res.json(rows);
+    });
+});
+
+apiRouter.get("*", (req, res) => {
   res.send('404 Sorry we couldnt find what you requested');
 });
 
