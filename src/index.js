@@ -4,13 +4,46 @@ import 'bootstrap/js/src';
 import './styles.scss';
 import navbarTemplate from './templates/navbar.html';
 import modalTemplate from './templates/modal.html';
+import checkoutTemplate from './templates/checkout.html';
 import mkCarousel from './carousel';
 import refreshProducts from './products';
 
 //  append navbar
 $(() => {
+  const $pageContent = $('<div class="page-content"></div>');
   $('#root').append(modalTemplate)
-    .append(navbarTemplate);
+    .append(navbarTemplate)
+    .append($pageContent);
+
+  function handleAJAXError(xhr, status, error) {
+    $pageContent
+      .empty()
+      .append(`<div>Ajax Error categories: ${error}</div>`);
+  }
+
+  // Load the data storaged in the LocalStorage
+  function getUserData(user) {
+    const userData = JSON.parse(localStorage.getItem(user));
+    $('#customer-name').val(`${userData.firstname} ${userData.lastname}`);
+    $('#customer-street').val(userData.street);
+    $('#customer-postcode').val(`${userData.postal} ${userData.city}`);
+  }
+
+  function checkSumPrice(cart) {
+    const cartPrices = JSON.parse(localStorage.getItem(cart));
+    $('.total-price-info h4').html(`Total Price: ${cartPrices} €`);
+  }
+  // checkout method
+  $('.checkout-proceed').click(() => {
+    $('.shopping-cart').hide();
+    $('.page-content')
+      .empty()
+      .append(checkoutTemplate);
+    getUserData('User');
+    checkSumPrice('totalPrice');
+  });
+  $pageContent.css(('padding-top'), $('.navbar').outerHeight());
+
   $('#cart').click(((e) => {
     e.preventDefault();
     $('.shopping-cart').toggle('slow', (() => {}));
@@ -20,9 +53,8 @@ $(() => {
     .done((categories) => {
       //  populate carousel with categories
       const $carousel = mkCarousel(categories);
-      $('#root').append($carousel);
+      $pageContent.append($carousel);
       $carousel.carousel();
-
       //  Iterate over the categories and append to navbar
       categories.forEach((category, number) => {
         $('.navbar-nav').append(`
@@ -32,16 +64,15 @@ $(() => {
       });
     })
     //  or fail trying
-    .fail((xhr, status, error) => {
-      $('#root').append(`<div>Ajax Error categories: ${error}</div>`);
-    });
+    .fail(handleAJAXError);
 
   //  ajax req and append products grid
   $.ajax('http://localhost:9090/api/products')
     .done((products) => {
       //  append products-grid after carousel
-      $('#root').append(`<div class="infobox"><h2 id="infos">All products (${Object.keys(products).length})</h2></div>`);
-      $('#root').append('<div id="products-grid" class="container-fluid"></div>');
+      $pageContent
+        .append(`<div class="infobox"><h2 id="infos">All products (${Object.keys(products).length})</h2></div>`)
+        .append('<div id="products-grid" class="container-fluid"></div>');
       //  populate products-grid with products
       $('#products-grid').append('<div class="row"></div>');
       refreshProducts(products, '-1');
@@ -57,20 +88,9 @@ $(() => {
       });
     })
     //  or fail trying
-    .fail((xhr, status, error) => {
-      $('#root').append(`<div>Ajax Error products: ${error}</div>`);
-    });
+    .fail(handleAJAXError);
 
   // Add a random active user ID
-
-  // Load the data storaged in the LocalStorage
-  function accessUserInfo(user) {
-    const getUserDataLS = JSON.parse(localStorage.getItem(user));
-    console.info('MY LS DATA', getUserDataLS);
-    // console.info('My Random user firstname: ', getUserDataLS.firstname);
-    // console.info('My Random user lastname: ', getUserDataLS.lastname);
-    // console.info('My Random user email: ', getUserDataLS.email);
-  }
 
   // Select an active user by his id and storage the data as an object in the localStorage
   function selectActiveUser(id) {
@@ -87,7 +107,6 @@ $(() => {
           street: user[0].street,
         };
         localStorage.setItem('User', JSON.stringify(userInfo));
-        accessUserInfo('User');
       });
   }
 

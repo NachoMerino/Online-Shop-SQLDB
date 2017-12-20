@@ -61,6 +61,7 @@ class Cart {
       storedProducts.forEach((product) => {
         totalQuantity += parseInt(product.quantity, 10);
         totalPrice += parseInt(product.price, 10) * parseInt(product.quantity, 10);
+        localStorage.setItem('totalPrice', JSON.stringify(totalPrice));
         $('.badge').text(product.quantity);
         $('.shopping-cart-items').append(`
           <li class="clearfix">
