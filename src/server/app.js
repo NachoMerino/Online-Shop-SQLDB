@@ -74,9 +74,18 @@ apiRouter.get('/activecustomers', (req, res) => {
   });
 });
 
-
 apiRouter.get('/customers/:userid', (req, res) => {
   con.query('select * from customers where active = 1 and id = ?', [req.params.userid], (err, rows) => {
+    if (err) {
+      throw err;
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+apiRouter.get('/payment_methods', (req, res) => {
+  con.query('SELECT * FROM payment_methods', (err, rows) => {
     if (err) {
       throw err;
     } else {
@@ -93,7 +102,6 @@ apiRouter.put('/activate/:userid', (req, res) => {
       res.json(rows);
     });
 });
-
 // postUser.sh
 apiRouter.post('/user', (req, res) => {
 
@@ -123,7 +131,7 @@ apiRouter.post('/user', (req, res) => {
       }
     });
 });
-
+//postOrder.sh
 apiRouter.post('/order', (req, res) => {
   /*
   fs.writeFile(path.resolve(__dirname, './../../orders/orders'+Date.now()+'.txt'), JSON.stringify(req.body),
@@ -149,7 +157,6 @@ apiRouter.post('/order', (req, res) => {
       }
     });
 });
-
 // modifyUser.sh
 apiRouter.put('/user/:userid', (req, res) => {
   var sql = 'UPDATE customers set ';
