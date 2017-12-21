@@ -35,6 +35,19 @@ $(() => {
     $checkout.find('[name="user-name"]').val(`${userData.firstname} ${userData.lastname}`);
     $checkout.find('[name="user-street"]').val(userData.street);
     $checkout.find('[name="user-city"]').val(`${userData.postal} ${userData.city}`);
+
+    const storedProducts = JSON.parse(localStorage.getItem('cart'));
+    const $productsList = $checkout.find('.products-list');
+    storedProducts.forEach((product) => {
+      $productsList.append(`<li>
+    <span class="product-name">${product.name}</span>
+    <span class="product-price">${product.price}</span>
+    <span class="product-quantity">${product.quantity}</span>
+    </li>`);
+    });
+    const totalPrice = JSON.parse(localStorage.getItem('totalPrice'));
+    $checkout.find('.cart-total').text(`Total ${totalPrice}`);
+
     $('.page-content')
       .empty()
       .append($checkout);
@@ -56,13 +69,6 @@ $(() => {
       })
       .fail(handleAJAXError);
     // loading products
-    const loadProducts = JSON.parse(localStorage.getItem('cart'));
-    const loadtotalPrice = JSON.parse(localStorage.getItem('totalPrice'));
-    $checkout.find('.products').html(`
-      <h4>Total Price: ${loadtotalPrice} €</h4>
-      <h5>Your order is:<h5>
-      <p>Name: ${loadProducts[0].name}</p>
-      `);
 
     $('.shopping-cart').hide();
   });
