@@ -112,6 +112,7 @@ DROP TABLE IF EXISTS `payment_methods`;
 CREATE TABLE `payment_methods` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `method` varchar(45) DEFAULT NULL,
+  `icon` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -122,7 +123,8 @@ CREATE TABLE `payment_methods` (
 
 LOCK TABLES `payment_methods` WRITE;
 /*!40000 ALTER TABLE `payment_methods` DISABLE KEYS */;
-INSERT INTO `payment_methods` VALUES (1,'paypal'),(2,'visa'),(3,'sepa'),(4,'bitcoin');
+INSERT INTO `payment_methods` VALUES (1,'paypal','http://pngimg.com/uploads/paypal/paypal_PNG21.png'),(2,'visa','https://www.oroyfinanzas.com/files/2015/05/visa.png'),(3,'sepa','https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Single_Euro_Payments_Area_logo.svg/1280px-Single_Euro_Payments_Area_logo.svg.png'),(4,'bitcoin','https://8356-presscdn-0-69-pagely.netdna-ssl.com/wp-content/uploads/2013/04/bitcoin.png');
+
 /*!40000 ALTER TABLE `payment_methods` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -185,4 +187,6 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-12-20  9:27:27
+
+-- Dump completed on 2017-12-20 23:49:46
+

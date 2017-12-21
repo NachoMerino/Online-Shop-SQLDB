@@ -21,10 +21,6 @@
   }
 }
 
-.carousel {
-  margin-top: 55px;
-}
-
 .carousel-inner {
     position: absolute;
     width: 100%;
@@ -221,8 +217,38 @@ nav {
   max-height:auto;
 }
 
-
-  
+.checkout-screen  {
+  img{
+    height: 2em;
+    width: auto;
+  }
+  .total-price-info{
+    position: absolute;
+    right: 25%;
+    padding: 1em;
+    width: 25vw;
+  }
+  label{
+    font-weight: bold;
+  }
+  margin: 0 auto;
+  margin-top: 3em;
+  width: 75%;
+  background-color: lightgray;
+  padding: 3em;
+  border: 2px solid blue;
+  .address-info{
+    width: 50%;
+    input{
+      border: 2px solid black;
+    }
+  }
+  button{
+    display: block;
+    margin: 0 auto;
+    margin-top: 3em;
+  }
+}
   
 
 

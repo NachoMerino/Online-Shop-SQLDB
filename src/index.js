@@ -4,25 +4,84 @@ import 'bootstrap/js/src';
 import './styles.scss';
 import navbarTemplate from './templates/navbar.html';
 import modalTemplate from './templates/modal.html';
+import checkoutTemplate from './templates/checkout.html';
+import paymentMethodRadioTemplate from './templates/payment-method-radio.html';
 import mkCarousel from './carousel';
 import refreshProducts from './products';
 
 //  append navbar
 $(() => {
-  $('#root').append(modalTemplate)
-    .append(navbarTemplate);
+  const $pageContent = $('<div class="page-content"></div>');
+  $('#root')
+    .append(modalTemplate)
+    .append(navbarTemplate)
+    .append($pageContent);
+
+  function handleAJAXError(xhr, status, error) {
+    $pageContent
+      .empty()
+      .append(`<div>Ajax Error categories: ${error}</div>`);
+  }
+
   $('#cart').click(((e) => {
     e.preventDefault();
     $('.shopping-cart').toggle('slow', (() => {}));
   }));
+
+  // checkout method
+  $('.checkout-proceed').click(() => {
+    const userData = JSON.parse(localStorage.getItem('User'));
+    const $checkout = $(checkoutTemplate);
+    $checkout.find('[name="user-name"]').val(`${userData.firstname} ${userData.lastname}`);
+    $checkout.find('[name="user-street"]').val(userData.street);
+    $checkout.find('[name="user-city"]').val(`${userData.postal} ${userData.city}`);
+
+    const storedProducts = JSON.parse(localStorage.getItem('cart'));
+    const $productsList = $checkout.find('.products-list');
+    storedProducts.forEach((product) => {
+      $productsList.append(`<li>
+    <span class="product-name">${product.name}</span>
+    <span class="product-price">${product.price}</span>
+    <span class="product-quantity">${product.quantity}</span>
+    </li>`);
+    });
+    const totalPrice = JSON.parse(localStorage.getItem('totalPrice'));
+    $checkout.find('.cart-total').text(`Total ${totalPrice}`);
+
+    $('.page-content')
+      .empty()
+      .append($checkout);
+
+    const $paymentMethods = $checkout
+      .find('.payment-methods')
+      .empty();
+
+    $.ajax('http://localhost:9090/api/payment_methods')
+      .done((data) => {
+        data.forEach((paymentMethod) => {
+          const $paymentMethod = $(paymentMethodRadioTemplate);
+          $paymentMethod.find('input').attr('value', paymentMethod.id);
+          $paymentMethod.find('img')
+            .attr('src', paymentMethod.icon)
+            .attr('alt', paymentMethod.method);
+          $paymentMethods.append($paymentMethod);
+        });
+      })
+      .fail(handleAJAXError);
+    // loading products
+
+    $('.shopping-cart').hide();
+  });
+
+  $pageContent.css(('padding-top'), $('.navbar').outerHeight());
+
   //  read categories
   $.ajax('http://localhost:9090/api/categories')
     .done((categories) => {
       //  populate carousel with categories
       const $carousel = mkCarousel(categories);
-      $('#root').append($carousel);
+      $pageContent.append($carousel);
       $carousel.carousel();
-
       //  Iterate over the categories and append to navbar
       categories.forEach((category, number) => {
         $('.navbar-nav').append(`
@@ -32,16 +91,15 @@ $(() => {
       });
     })
     //  or fail trying
-    .fail((xhr, status, error) => {
-      $('#root').append(`<div>Ajax Error categories: ${error}</div>`);
-    });
+    .fail(handleAJAXError);
 
   //  ajax req and append products grid
   $.ajax('http://localhost:9090/api/products')
     .done((products) => {
       //  append products-grid after carousel
-      $('#root').append(`<div class="infobox"><h2 id="infos">All products (${Object.keys(products).length})</h2></div>`);
-      $('#root').append('<div id="products-grid" class="container-fluid"></div>');
+      $pageContent
+        .append(`<div class="infobox"><h2 id="infos">All products (${Object.keys(products).length})</h2></div>`)
+        .append('<div id="products-grid" class="container-fluid"></div>');
       //  populate products-grid with products
       $('#products-grid').append('<div class="row"></div>');
       refreshProducts(products, '-1');
@@ -57,20 +115,9 @@ $(() => {
       });
     })
     //  or fail trying
-    .fail((xhr, status, error) => {
-      $('#root').append(`<div>Ajax Error products: ${error}</div>`);
-    });
+    .fail(handleAJAXError);
 
   // Add a random active user ID
-
-  // Load the data storaged in the LocalStorage
-  function accessUserInfo(user) {
-    const getUserDataLS = JSON.parse(localStorage.getItem(user));
-    console.info('MY LS DATA', getUserDataLS);
-    // console.info('My Random user firstname: ', getUserDataLS.firstname);
-    // console.info('My Random user lastname: ', getUserDataLS.lastname);
-    // console.info('My Random user email: ', getUserDataLS.email);
-  }
 
   // Select an active user by his id and storage the data as an object in the localStorage
   function selectActiveUser(id) {
@@ -87,7 +134,6 @@ $(() => {
           street: user[0].street,
         };
         localStorage.setItem('User', JSON.stringify(userInfo));
-        accessUserInfo('User');
       });
   }
 
