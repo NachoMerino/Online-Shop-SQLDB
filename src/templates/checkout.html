@@ -1,35 +1,42 @@
-<div class="checkout-screen">
-  <form>
-    <div class="total-price-info">
-      <h4>Total Price:</h4>
-    </div>
-    <fieldset class="payment-info">
-      <legend>Choose Payment</legend>
-      <div class="form-check">
-        <label class="form-check-label">
-          <input type="radio" class="form-check-input" name="optionsRadios" id="payment-visa" value="option1"> 
-          <img src="./../static/assets/images/visa-icon.png" alt="visa-icon">
-        </label>
+
+<form class="checkout-screen container-fluid">
+  <div class="row">
+    <div class="col-12 col-md-6 payment-methods">
+      loading payment methods
+    </div><!-- end radios -->
+
+    <div class="col-12 col-md-6 products">
+      products
+    </div><!-- end products -->
+  </div>
+
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <div class="form-group">
+        <label for="user-name">Name</label>
+        <input id="user-name" type="text" class="form-control" name="user-name" placeholder="Max Mustermann" />
       </div>
-      <div class="form-check">
-        <label class="form-check-label">
-          <input type="radio" class="form-check-input" name="optionsRadios" id="payment-paypal" value="option2">
-          <img src="./../static/assets/images/paypal-icon.png" alt="Paypal-icon">
-        </label>
+
+      <div class="form-group">
+        <label for="user-street">Street</label>
+        <input id="user-street" type="text" class="form-control" name="user-street" placeholder="Beispielstraße 42" />
       </div>
-      <div class="form-check">
-        <label class="form-check-label">
-          <input type="radio" class="form-check-input" name="optionsRadios" id="payment-bitcoin" value="option3">
-           <img src="./../static/assets/images/bitcoin-icon.png" alt="Bitcoin-icon">
-        </label>
+
+      <div class="form-group">
+        <label for="user-city">ZIP and City</label>
+        <input id="user-city" type="text" class="form-control" name="user-city" placeholder="5446 Börlin" />
       </div>
-    </fieldset>
-    <div class="address-info">
-      <label for="confirm-address">Confirm Address:</label>
-      <input type="text" class="form-control" id="customer-name" placeholder="Customer Name">
-      <input type="text" class="form-control" id="customer-street" placeholder="Customer Street">
-      <input type="text" class="form-control" id="customer-postcode" placeholder="Customer PostCode">
-    </div>
-    <button type="submit" class="btn btn-secondary">Buy</button>
-  </form>
-</div>
+    </div><!-- end user -->
+
+    <div class="col-12 col-md-6 text-right">
+      <div class="row">
+        <div class="col-6">
+          <button class="btn btn-default">Cancel</button>
+        </div>
+        <div class="col-6">
+          <button class="btn btn-primary">Buy</button>
+        </div>
+      </div>
+    </div><!-- end buttons -->
+  </div>
+</form>

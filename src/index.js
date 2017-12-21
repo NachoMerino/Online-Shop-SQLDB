@@ -5,13 +5,15 @@ import './styles.scss';
 import navbarTemplate from './templates/navbar.html';
 import modalTemplate from './templates/modal.html';
 import checkoutTemplate from './templates/checkout.html';
+import paymentMethodRadioTemplate from './templates/payment-method-radio.html';
 import mkCarousel from './carousel';
 import refreshProducts from './products';
 
 //  append navbar
 $(() => {
   const $pageContent = $('<div class="page-content"></div>');
-  $('#root').append(modalTemplate)
+  $('#root')
+    .append(modalTemplate)
     .append(navbarTemplate)
     .append($pageContent);
 
@@ -21,33 +23,52 @@ $(() => {
       .append(`<div>Ajax Error categories: ${error}</div>`);
   }
 
-  // Load the data storaged in the LocalStorage
-  function getUserData(user) {
-    const userData = JSON.parse(localStorage.getItem(user));
-    $('#customer-name').val(`${userData.firstname} ${userData.lastname}`);
-    $('#customer-street').val(userData.street);
-    $('#customer-postcode').val(`${userData.postal} ${userData.city}`);
-  }
-
-  function checkSumPrice(cart) {
-    const cartPrices = JSON.parse(localStorage.getItem(cart));
-    $('.total-price-info h4').html(`Total Price: ${cartPrices} €`);
-  }
-  // checkout method
-  $('.checkout-proceed').click(() => {
-    $('.shopping-cart').hide();
-    $('.page-content')
-      .empty()
-      .append(checkoutTemplate);
-    getUserData('User');
-    checkSumPrice('totalPrice');
-  });
-  $pageContent.css(('padding-top'), $('.navbar').outerHeight());
-
   $('#cart').click(((e) => {
     e.preventDefault();
     $('.shopping-cart').toggle('slow', (() => {}));
   }));
+
+  // checkout method
+  $('.checkout-proceed').click(() => {
+    const userData = JSON.parse(localStorage.getItem('User'));
+    const $checkout = $(checkoutTemplate);
+    $checkout.find('[name="user-name"]').val(`${userData.firstname} ${userData.lastname}`);
+    $checkout.find('[name="user-street"]').val(userData.street);
+    $checkout.find('[name="user-city"]').val(`${userData.postal} ${userData.city}`);
+    $('.page-content')
+      .empty()
+      .append($checkout);
+
+    const $paymentMethods = $checkout
+      .find('.payment-methods')
+      .empty();
+
+    $.ajax('http://localhost:9090/api/payment_methods')
+      .done((data) => {
+        data.forEach((paymentMethod) => {
+          const $paymentMethod = $(paymentMethodRadioTemplate);
+          $paymentMethod.find('input').attr('value', paymentMethod.id);
+          $paymentMethod.find('img')
+            .attr('src', paymentMethod.icon)
+            .attr('alt', paymentMethod.method);
+          $paymentMethods.append($paymentMethod);
+        });
+      })
+      .fail(handleAJAXError);
+    // loading products
+    const loadProducts = JSON.parse(localStorage.getItem('cart'));
+    const loadtotalPrice = JSON.parse(localStorage.getItem('totalPrice'));
+    $checkout.find('.products').html(`
+      <h4>Total Price: ${loadtotalPrice} €</h4>
+      <h5>Your order is:<h5>
+      <p>Name: ${loadProducts[0].name}</p>
+      `);
+
+    $('.shopping-cart').hide();
+  });
+
+  $pageContent.css(('padding-top'), $('.navbar').outerHeight());
+
   //  read categories
   $.ajax('http://localhost:9090/api/categories')
     .done((categories) => {
