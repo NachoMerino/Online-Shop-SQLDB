@@ -11,6 +11,7 @@ import refreshProducts from './products';
 
 // our server provider address
 const server = 'http://nachoserver:9090';
+// const server = 'http://localhost:9090';
 
 //  append navbar
 $(() => {
@@ -180,8 +181,11 @@ $(() => {
     $shopingCart.toggle('slow');
     $userLogin.hide('slow');
     $userRegister.hide('slow');
+    const checkUserLogged = JSON.parse(localStorage.getItem('user'));
+    if (checkUserLogged !== null) {
+      $('.checkout-proceed').empty().html('<button type="button" class="btn btn-dark btn-block checkout-proceed">Checkout</button>');
+    }
   }));
-
 
   // checkout method
   $('.checkout-proceed').click(() => {
@@ -191,7 +195,6 @@ $(() => {
       $userLogin.toggle('slow');
       createRandomUser();
       $inputEmail.focus();
-      alert('user not');
       return;
     }
     $shopingCart.hide();
