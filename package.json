@@ -23,10 +23,10 @@
   },
   "homepage": "https://github.com/LeoDvg/Neutrino-Shop#readme",
   "devDependencies": {
-    "neutrino": "^7.3.3",
+    "neutrino": "^7.4.0",
     "neutrino-middleware-styles-loader": "0.0.6",
-    "neutrino-preset-airbnb-base": "^7.3.3",
-    "neutrino-preset-web": "^7.3.3",
+    "neutrino-preset-airbnb-base": "^7.4.0",
+    "neutrino-preset-web": "^7.4.0",
     "sass-loader": "^6.0.6"
   },
   "dependencies": {

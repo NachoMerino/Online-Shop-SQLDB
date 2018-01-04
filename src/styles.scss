@@ -266,6 +266,15 @@ nav {
   display: inline-block;
 }
 
+.login-button,
+.register-button,
+.usertools-button,
+.logout-button {
+  &:hover {
+    color: lightgray;
+  }
+}
+
 #new-account p {
   margin-top: .5em;
 }
@@ -318,11 +327,14 @@ nav {
     }
 
     .form-register-heading,
-    .form-signin-heading{
+    .form-signin-heading {
       margin-bottom: 10px;
     }
     button {
       margin-top: 1em;
     }
   }
+}
+.checkout-blocked{
+  color: red;
 }

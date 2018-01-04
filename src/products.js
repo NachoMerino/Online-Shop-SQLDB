@@ -59,6 +59,10 @@ export default function refreshProducts(products, type) {
   //  add to cart
   $('.addCart').click((eventObj) => {
     $('.user-login, .user-register').hide('slow');
+    const loggedUser = JSON.parse(localStorage.getItem('user'));
+    if (loggedUser === null) {
+      $('.checkout-proceed').empty().html('<button type="button" class="btn btn-dark btn-block checkout-blocked">You must be logged to continue</button>');
+    }
     $.ajax('http://nachoserver:9090/api/products')
       .done((localStoragePicture) => {
         //  define obj

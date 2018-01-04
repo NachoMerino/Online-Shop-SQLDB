@@ -34,41 +34,9 @@ $(() => {
   const $registerButton = $('.register-button');
   const $userButton = $('.usertools-button');
   const $logoutButton = $('.logout-button');
-  
-  // check if user exist in localstorage
-  const loggedUser = JSON.parse(localStorage.getItem('user'));
-  if (loggedUser !== null) {
-    const user = JSON.parse(localStorage.getItem('user'));
-    $loginButton.hide();
-    $registerButton.hide();
-    $userButton
-      .show()
-      .html(`<i class="fa fa-user" aria-hidden="true"></i> ${user.firstname}`);
-    $logoutButton.show();
-  }
+  const $shopingCart = $('.shopping-cart');
 
-  $($pageContent).click(() => {
-    $userRegister.hide('slow');
-    $userLogin.hide('slow');
-  });
-
-  //  fake login
-  $('.form-signin').on('submit', ((e) => {
-    e.preventDefault();
-    $userLogin.hide('slow');
-    $('#inputEmail').val('');
-    $('#inputUsername').val('');
-    $loginButton.hide();
-    $registerButton.hide();
-    const user = JSON.parse(localStorage.getItem('user'));
-    $userButton
-      .show()
-      .html(`<i class="fa fa-user" aria-hidden="true"></i> ${user.firstname}`);
-    $logoutButton.show();
-  }));
-  //  fake login
-  $('.login-button, .register').click((e) => {
-    e.preventDefault();
+  function createRandomUser() {
     // Add a random active user ID
     // Select an active user by his id and storage the data as an object in the localStorage
     function selectActiveUser(id) {
@@ -85,6 +53,7 @@ $(() => {
             street: user[0].street,
           };
           localStorage.setItem('user', JSON.stringify(userInfo));
+          // add data to our login boxes
           $('#inputEmail').val(userInfo.email);
           $('#inputUsername').val(`${userInfo.firstname} ${userInfo.lastname}`);
         });
@@ -105,6 +74,66 @@ $(() => {
         // selected one user with a random math of its id
         selectActiveUser(activeUserID[userID]);
       });
+  }
+
+  // check if user exist in localstorage
+  const loggedUser = JSON.parse(localStorage.getItem('user'));
+  if (loggedUser !== null) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    $loginButton.hide();
+    $registerButton.hide();
+    $userButton
+      .show()
+      .html(`<i class="fa fa-user" aria-hidden="true"></i> ${user.firstname}`);
+    $logoutButton.show();
+  }
+
+  $($pageContent).click(() => {
+    $userRegister.hide('slow');
+    $userLogin.hide('slow');
+  });
+
+  // fake register
+  $('.form-register').on('submit', ((e) => {
+    e.preventDefault();
+    localStorage.removeItem('user');
+    const userInfo = {
+      firstname: $('.form-register #inputFirstname').val(),
+      lastname: $('.form-register #inputLastname').val(),
+      birthdate: $('.form-register #inputDate').val(),
+      email: $('.form-register #inputEmail').val(),
+      city: $('.form-register #inputCity').val(),
+      postal: $('.form-register #inputPostal').val(),
+      street: $('.form-register #inputStreet').val(),
+    };
+    localStorage.setItem('user', JSON.stringify(userInfo));
+    $('.user-register').hide();
+    $userButton
+      .show()
+      .html(`<i class="fa fa-user" aria-hidden="true"></i> ${userInfo.firstname}`);
+    $logoutButton.show();
+    $loginButton.hide();
+    $registerButton.hide();
+  }));
+
+
+  //  fake login
+  $('.form-signin').on('submit', ((e) => {
+    e.preventDefault();
+    $userLogin.hide('slow');
+    $('#inputEmail').val('');
+    $('#inputUsername').val('');
+    $loginButton.hide();
+    $registerButton.hide();
+    const user = JSON.parse(localStorage.getItem('user'));
+    $userButton
+      .show()
+      .html(`<i class="fa fa-user" aria-hidden="true"></i> ${user.firstname}`);
+    $logoutButton.show();
+  }));
+  $('.login-button, .register').click((e) => {
+    e.preventDefault();
+    createRandomUser();
     $userLogin.toggle('slow');
     $inputEmail.focus();
     if ($userRegister.is(':visible')) {
@@ -114,12 +143,14 @@ $(() => {
   // logout
   $logoutButton.click(() => {
     localStorage.removeItem('user');
+    localStorage.removeItem('cart');
+    $shopingCart.hide();
+    $('#cart').hide();
     $logoutButton.hide();
     $userButton.hide();
     $loginButton.show();
     $registerButton.show();
   });
-
 
   $('.signin').click((e) => {
     e.preventDefault();
@@ -130,16 +161,7 @@ $(() => {
     }
   });
 
-  $registerButton.click((e) => {
-    e.preventDefault();
-    $userRegister.toggle('slow');
-    $inputFirstname.focus();
-    if ($userLogin.is(':visible')) {
-      $userLogin.hide('slow');
-    }
-  });
-
-  $('.new-registation').click((e) => {
+  $('.new-registation, .register-button').click((e) => {
     e.preventDefault();
     $userRegister.toggle('slow');
     $inputFirstname.focus();
@@ -155,14 +177,25 @@ $(() => {
   }
   $('#cart').click(((e) => {
     e.preventDefault();
-    $('.shopping-cart').toggle('slow');
+    $shopingCart.toggle('slow');
+    $userLogin.hide('slow');
+    $userRegister.hide('slow');
   }));
 
 
   // checkout method
   $('.checkout-proceed').click(() => {
-    $('.shopping-cart').hide();
-    const userData = JSON.parse(localStorage.getItem('User'));
+    const userLogged = JSON.parse(localStorage.getItem('user'));
+    if (userLogged === null) {
+      $shopingCart.hide('slow');
+      $userLogin.toggle('slow');
+      createRandomUser();
+      $inputEmail.focus();
+      alert('user not');
+      return;
+    }
+    $shopingCart.hide();
+    const userData = JSON.parse(localStorage.getItem('user'));
     const $checkout = $(checkoutTemplate);
     $checkout.find('[name="user-name"]').val(`${userData.firstname} ${userData.lastname}`);
     $checkout.find('[name="user-street"]').val(userData.street);
@@ -281,46 +314,4 @@ $(() => {
     })
     //  or fail trying
     .fail(handleAJAXError);
-
-  // Add a random active user ID
-
-  // Select an active user by his id and storage the data as an object in the localStorage
-  /*
-  function selectActiveUser(id) {
-    $.ajax(`${server}/api/customers/${id}`)
-      .done((user) => {
-        const userInfo = {
-          id: user[0].id,
-          firstname: user[0].firstname,
-          lastname: user[0].lastname,
-          email: user[0].email,
-          phone: user[0].phone,
-          city: user[0].city,
-          postal: user[0].postal,
-          street: user[0].street,
-        };
-        localStorage.setItem('user', JSON.stringify(userInfo));
-      });
-  }
-
-  // make a query for all the active users in our shop
-  $.ajax(`${server}/api/activecustomers`)
-    .done((userIDs) => {
-      const arrayIDs = [];
-      userIDs.forEach((id) => {
-        arrayIDs.push(id);
-      });
-      const activeUserID = [];
-      for (let i = 0; i < arrayIDs.length; i += 1) {
-        activeUserID.push(arrayIDs[i].id);
-      }
-      const max = activeUserID.length - 1;
-      const userID = Math.floor(Math.random() * max);
-      // selected one user with a random math of its id
-      selectActiveUser(activeUserID[userID]);
-    });
-
-  localStorage.removeItem('user');
-  // End
-  */
 });
