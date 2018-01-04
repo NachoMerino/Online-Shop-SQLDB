@@ -30,6 +30,22 @@ $(() => {
   const $userRegister = $('.user-register');
   const $inputEmail = $('#inputEmail');
   const $inputFirstname = $('#inputFirstname');
+  const $loginButton = $('.login-button');
+  const $registerButton = $('.register-button');
+  const $userButton = $('.usertools-button');
+  const $logoutButton = $('.logout-button');
+  
+  // check if user exist in localstorage
+  const loggedUser = JSON.parse(localStorage.getItem('user'));
+  if (loggedUser !== null) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    $loginButton.hide();
+    $registerButton.hide();
+    $userButton
+      .show()
+      .html(`<i class="fa fa-user" aria-hidden="true"></i> ${user.firstname}`);
+    $logoutButton.show();
+  }
 
   $($pageContent).click(() => {
     $userRegister.hide('slow');
@@ -42,16 +58,18 @@ $(() => {
     $userLogin.hide('slow');
     $('#inputEmail').val('');
     $('#inputUsername').val('');
-    $('.usertools-button').show();
-    $('.logout-button').show();
-    $('.login-button').hide();
-    $('.register-button').hide();
+    $loginButton.hide();
+    $registerButton.hide();
+    const user = JSON.parse(localStorage.getItem('user'));
+    $userButton
+      .show()
+      .html(`<i class="fa fa-user" aria-hidden="true"></i> ${user.firstname}`);
+    $logoutButton.show();
   }));
   //  fake login
   $('.login-button, .register').click((e) => {
     e.preventDefault();
     // Add a random active user ID
-
     // Select an active user by his id and storage the data as an object in the localStorage
     function selectActiveUser(id) {
       $.ajax(`${server}/api/customers/${id}`)
@@ -66,12 +84,11 @@ $(() => {
             postal: user[0].postal,
             street: user[0].street,
           };
-          localStorage.setItem('User', JSON.stringify(userInfo));
+          localStorage.setItem('user', JSON.stringify(userInfo));
           $('#inputEmail').val(userInfo.email);
           $('#inputUsername').val(`${userInfo.firstname} ${userInfo.lastname}`);
         });
     }
-
     // make a query for all the active users in our shop
     $.ajax(`${server}/api/activecustomers`)
       .done((userIDs) => {
@@ -88,14 +105,21 @@ $(() => {
         // selected one user with a random math of its id
         selectActiveUser(activeUserID[userID]);
       });
-
-    localStorage.removeItem('User');
     $userLogin.toggle('slow');
     $inputEmail.focus();
     if ($userRegister.is(':visible')) {
       $userRegister.hide('slow');
     }
   });
+  // logout
+  $logoutButton.click(() => {
+    localStorage.removeItem('user');
+    $logoutButton.hide();
+    $userButton.hide();
+    $loginButton.show();
+    $registerButton.show();
+  });
+
 
   $('.signin').click((e) => {
     e.preventDefault();
@@ -106,7 +130,7 @@ $(() => {
     }
   });
 
-  $('.register-button').click((e) => {
+  $registerButton.click((e) => {
     e.preventDefault();
     $userRegister.toggle('slow');
     $inputFirstname.focus();
@@ -275,7 +299,7 @@ $(() => {
           postal: user[0].postal,
           street: user[0].street,
         };
-        localStorage.setItem('User', JSON.stringify(userInfo));
+        localStorage.setItem('user', JSON.stringify(userInfo));
       });
   }
 
@@ -296,7 +320,7 @@ $(() => {
       selectActiveUser(activeUserID[userID]);
     });
 
-  localStorage.removeItem('User');
+  localStorage.removeItem('user');
   // End
   */
 });

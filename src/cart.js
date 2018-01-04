@@ -49,6 +49,7 @@ class Cart {
       $('.shopping-cart').hide();
       $('.cart').hide();
     } else {
+      this.cart.products = JSON.parse(localStorage.getItem('cart'));
       $('.badge').text(Object.keys(this.cart.products).length);
       $('.badge').show();
       $('.shopping-cart').show();
