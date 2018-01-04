@@ -68,7 +68,8 @@ class Cart {
             <button type="button" class="close removeItemButton" aria-label="Close" data-id="${product.id}">
               <span aria-hidden="true">&times;</span>
             </button>
-            <img class="cart-img" src="/static/assets/images/0${product.catid}.jpg" alt="${product.name}" />
+            <!-- <img class="cart-img" src="/static/assets/images/0${product.catid}.jpg" alt="${product.name}" /> -->
+            <img class="cart-img" src="${product.pictures}" alt="${product.name}" />
             <span class="item-name">${product.name}</span>
             <span class="item-price">€ ${product.price}</span>
             <span class="item-quantity">Quantity: ${product.quantity}</span>
@@ -87,7 +88,7 @@ class Cart {
     return this;
   }
   clear() {
-    localStorage.clear();
+    localStorage.removeItem('cart');
     this.cart.products = [];
     this.update();
     return this;

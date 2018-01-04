@@ -33,7 +33,9 @@ export default function mkCarousel(items) {
     }
     $indicators.append($indicator);
     $slides.append($slide);
-    $slide.css('background-image', `url(static/assets/images/0${number}.jpg)`);
+    // $slide.css('background-image', `url(static/assets/images/0${number}.jpg)`);
+    // loading pictures from nacho server
+    $slide.css('background-image', `url(${item.pictures})`);
   });
   return $el;
 }

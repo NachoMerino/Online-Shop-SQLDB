@@ -1,0 +1,1 @@
+{"products":[{"id":"0","catid":"0","name":"Dell 1000","price":"500","quantity":2},{"id":"1","catid":"0","name":"Dell 2000","price":"600","quantity":2},{"id":"2","catid":"0","name":"Dell 3000","price":"700","quantity":1}],"user":{"customer_id":37,"name":"Ulrike Brueckner","street":"Bundesalle 70","city":"10403 Erfurt"},"payment_method":"1"}

@@ -3,6 +3,10 @@
 .card {
   margin-top: $grid-gutter-width * 0.5;
   margin-bottom: $grid-gutter-width * 0.5;
+  img {
+    height: 200px;
+    width: auto;
+  }
 }
 
 .shop- {
@@ -14,7 +18,7 @@
       padding: $grid-gutter-width * 0.5;
     }
 
-    &-description h2{
+    &-description h2 {
       color: #fff;
       text-align: center;
     }
@@ -22,9 +26,9 @@
 }
 
 .carousel-inner {
-    position: absolute;
-    width: 100%;
-    overflow: hidden;
+  position: absolute;
+  width: 100%;
+  overflow: hidden;
 }
 
 .carousel-item {
@@ -38,16 +42,17 @@
 }
 
 .bg-light {
-    background-color: transparent !important;
+  background-color: transparent !important;
 }
 
-.modal-lorem, .modal-total {
+.modal-lorem,
+.modal-total {
   margin: 20px;
 }
 
 .modal-content img {
   margin: 10px auto;
-  max-width:80%;
+  max-width: 80%;
 }
 
 .detailsButton {
@@ -60,7 +65,9 @@ $light-text: #ABB0BE;
 
 @import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css);
 
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   box-sizing: border-box;
 }
 
@@ -70,15 +77,15 @@ nav {
     float: right;
   }
   ul {
-    
+
     li {
       display: inline;
       margin: auto auto;
-      vertical-align:middle;
+      vertical-align: middle;
       a {
         color: #fff;
         text-decoration: none;
-        
+
         &:hover {
           color: white;
           text-decoration: none;
@@ -89,84 +96,84 @@ nav {
 }
 
 #products-grid {
-  position:absolute;
+  position: absolute;
 }
 
 .shopping-nav {
-  margin:0;
-  padding:0;
+  margin: 0;
+  padding: 0;
+  display: inline-block;
 }
 
 .badge {
-    background-color: #6394F8;
-    border-radius: 10px;
-    color: white;
-    display: inline-block;
-    font-size: 12px;
-    line-height: 1;
-    padding: 3px 7px;
-    text-align: center;
-    vertical-align: middle;
-    white-space: nowrap;
+  background-color: #6394F8;
+  border-radius: 10px;
+  color: white;
+  display: inline-block;
+  font-size: 12px;
+  line-height: 1;
+  padding: 3px 7px;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
 }
 
 .shopping-cart {
   position: fixed!important;
   box-shadow: rgba(0, 0, 0, 0.2) 0px 10px 16px 0px, rgba(0, 0, 0, 0.19) 0px 6px 20px 0px;
-  z-index:10;
+  z-index: 8;
   margin: 20px 0;
-  right:10px;
-  top:50px;
+  right: 10px;
+  top: 50px;
   background: white;
   width: 380px;
   position: relative;
   border-radius: 3px;
   padding: 20px;
-  
-  
+
+
   .shopping-cart-header {
     border-bottom: 1px solid #E8E8E8;
     padding-bottom: 15px;
-    
+
     .shopping-cart-total {
       float: right;
     }
   }
-  
+
   .removeItem {
     margin: 15px;
   }
 
   .shopping-cart-items {
-    
+
     padding: 20px 0;
 
-      li {
-        margin-bottom: 18px;
-        list-style-type: none;
-      }
+    li {
+      margin-bottom: 18px;
+      list-style-type: none;
+    }
 
     img {
       float: left;
       margin-right: 12px;
     }
-    
+
     .item-name {
       display: block;
       padding-top: 10px;
       font-size: 16px;
     }
-    
+
     .item-price {
       color: $main-color;
       margin-right: 8px;
     }
-    
+
     .item-quantity {
       color: $light-text;
     }
   }
-   
 }
 
 .shopping-cart:after {
@@ -192,7 +199,7 @@ nav {
 
 .button {
   background: $main-color;
-  color:white;
+  color: white;
   text-align: center;
   padding: 12px;
   text-decoration: none;
@@ -200,7 +207,7 @@ nav {
   border-radius: 3px;
   font-size: 16px;
   margin: 25px 0 15px 0;
-  
+
   &:hover {
     background: lighten($main-color, 3%);
   }
@@ -213,22 +220,22 @@ nav {
 }
 
 .cart-img {
-  max-width:100px;
-  max-height:auto;
+  max-width: 100px;
+  max-height: auto;
 }
 
-.checkout-screen  {
-  img{
+.checkout-screen {
+  img {
     height: 2em;
     width: auto;
   }
-  .total-price-info{
+  .total-price-info {
     position: absolute;
     right: 25%;
     padding: 1em;
     width: 25vw;
   }
-  label{
+  label {
     font-weight: bold;
   }
   margin: 0 auto;
@@ -237,19 +244,85 @@ nav {
   background-color: lightgray;
   padding: 3em;
   border: 2px solid blue;
-  .address-info{
+  .address-info {
     width: 50%;
-    input{
+    input {
       border: 2px solid black;
     }
   }
-  button{
+  button {
     display: block;
     margin: 0 auto;
     margin-top: 3em;
   }
 }
-  
 
+.login-nav,
+.register-nav,
+.usertools-nav,
+.logout-nav {
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+}
 
+#new-account p {
+  margin-top: .5em;
+}
 
+.user-login,
+.user-register {
+  position: fixed!important;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 10px 16px 0px, rgba(0, 0, 0, 0.19) 0px 6px 20px 0px;
+  z-index: 20;
+  margin: 1em 0;
+  right: .5em;
+  top: 1em;
+  background: white;
+  width: 380px;
+  position: relative;
+  border-radius: 3px;
+  padding: 2em 1em;
+  .form-signin,
+  .form-register {
+    max-width: 330px;
+    padding: 15px;
+    margin: 0 auto;
+    .checkbox {
+      font-weight: 400;
+    }
+    .form-control {
+      position: relative;
+      box-sizing: border-box;
+      height: auto;
+      padding: 10px;
+      font-size: 16px;
+    }
+    .form-control:focus {
+      z-index: 2;
+    }
+    input[type="email"] {
+      margin-bottom: 0px;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+    input[type="text"] {
+      margin-bottom: 0px;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+    input[type="password"] {
+      margin-bottom: 10px;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    .form-register-heading,
+    .form-signin-heading{
+      margin-bottom: 10px;
+    }
+    button {
+      margin-top: 1em;
+    }
+  }
+}

@@ -9,6 +9,9 @@ import paymentMethodRadioTemplate from './templates/payment-method-radio.html';
 import mkCarousel from './carousel';
 import refreshProducts from './products';
 
+// our server provider address
+const server = 'http://nachoserver:9090';
+
 //  append navbar
 $(() => {
   const $pageContent = $('<div class="page-content"></div>');
@@ -16,20 +19,125 @@ $(() => {
     .append(modalTemplate)
     .append(navbarTemplate)
     .append($pageContent);
+  $('.shopping-cart, #cart, .usertools-button, .logout-button').hide();
+
+  // login & register
+  $('.user-login, .user-register')
+    .hide()
+    .css(('margin-top'), $('.navbar').outerHeight());
+
+  const $userLogin = $('.user-login');
+  const $userRegister = $('.user-register');
+  const $inputEmail = $('#inputEmail');
+  const $inputFirstname = $('#inputFirstname');
+
+  $($pageContent).click(() => {
+    $userRegister.hide('slow');
+    $userLogin.hide('slow');
+  });
+
+  //  fake login
+  $('.form-signin').on('submit', ((e) => {
+    e.preventDefault();
+    $userLogin.hide('slow');
+    $('#inputEmail').val('');
+    $('#inputUsername').val('');
+    $('.usertools-button').show();
+    $('.logout-button').show();
+    $('.login-button').hide();
+    $('.register-button').hide();
+  }));
+  //  fake login
+  $('.login-button, .register').click((e) => {
+    e.preventDefault();
+    // Add a random active user ID
+
+    // Select an active user by his id and storage the data as an object in the localStorage
+    function selectActiveUser(id) {
+      $.ajax(`${server}/api/customers/${id}`)
+        .done((user) => {
+          const userInfo = {
+            id: user[0].id,
+            firstname: user[0].firstname,
+            lastname: user[0].lastname,
+            email: user[0].email,
+            phone: user[0].phone,
+            city: user[0].city,
+            postal: user[0].postal,
+            street: user[0].street,
+          };
+          localStorage.setItem('User', JSON.stringify(userInfo));
+          $('#inputEmail').val(userInfo.email);
+          $('#inputUsername').val(`${userInfo.firstname} ${userInfo.lastname}`);
+        });
+    }
+
+    // make a query for all the active users in our shop
+    $.ajax(`${server}/api/activecustomers`)
+      .done((userIDs) => {
+        const arrayIDs = [];
+        userIDs.forEach((id) => {
+          arrayIDs.push(id);
+        });
+        const activeUserID = [];
+        for (let i = 0; i < arrayIDs.length; i += 1) {
+          activeUserID.push(arrayIDs[i].id);
+        }
+        const max = activeUserID.length - 1;
+        const userID = Math.floor(Math.random() * max);
+        // selected one user with a random math of its id
+        selectActiveUser(activeUserID[userID]);
+      });
+
+    localStorage.removeItem('User');
+    $userLogin.toggle('slow');
+    $inputEmail.focus();
+    if ($userRegister.is(':visible')) {
+      $userRegister.hide('slow');
+    }
+  });
+
+  $('.signin').click((e) => {
+    e.preventDefault();
+    $userLogin.toggle('slow');
+    $inputEmail.focus();
+    if ($userRegister.is(':visible')) {
+      $userRegister.hide('slow');
+    }
+  });
+
+  $('.register-button').click((e) => {
+    e.preventDefault();
+    $userRegister.toggle('slow');
+    $inputFirstname.focus();
+    if ($userLogin.is(':visible')) {
+      $userLogin.hide('slow');
+    }
+  });
+
+  $('.new-registation').click((e) => {
+    e.preventDefault();
+    $userRegister.toggle('slow');
+    $inputFirstname.focus();
+    if ($userLogin.is(':visible')) {
+      $userLogin.hide('slow');
+    }
+  });
 
   function handleAJAXError(xhr, status, error) {
     $pageContent
       .empty()
       .append(`<div>Ajax Error categories: ${error}</div>`);
   }
-
   $('#cart').click(((e) => {
     e.preventDefault();
-    $('.shopping-cart').toggle('slow', (() => {}));
+    $('.shopping-cart').toggle('slow');
   }));
+
 
   // checkout method
   $('.checkout-proceed').click(() => {
+    $('.shopping-cart').hide();
     const userData = JSON.parse(localStorage.getItem('User'));
     const $checkout = $(checkoutTemplate);
     $checkout.find('[name="user-name"]').val(`${userData.firstname} ${userData.lastname}`);
@@ -48,6 +156,41 @@ $(() => {
     const totalPrice = JSON.parse(localStorage.getItem('totalPrice'));
     $checkout.find('.cart-total').text(`Total ${totalPrice}`);
 
+    $checkout.find('.checkout-buy').click((evt) => {
+      evt.preventDefault();
+      const data = JSON.stringify({
+        products: storedProducts,
+        user: {
+          customer_id: userData.id,
+          customer_email: userData.email,
+          name: $checkout.find('[name="user-name"]').val(),
+          street: $checkout.find('[name="user-street"]').val(),
+          city: $checkout.find('[name="user-city"]').val(),
+        },
+        payment_method_id: $checkout.find('[name="payment"]:checked').val(),
+        total_price: totalPrice,
+      });
+      $.ajax(`${server}/api/order`, {
+        method: 'POST',
+        contentType: 'application/json',
+        data,
+      })
+        .done(() => {
+          $checkout
+            .empty()
+            .append(`<div class="alert alert-success">
+            The order has been placed!
+            </div>`);
+        })
+        .fail(() => {
+          $checkout
+            .empty()
+            .append(`<div class="alert alert-danger">
+            An error ocurred, sorry, we dont give back money!
+            </div>`);
+        });
+    });
+
     $('.page-content')
       .empty()
       .append($checkout);
@@ -56,7 +199,7 @@ $(() => {
       .find('.payment-methods')
       .empty();
 
-    $.ajax('http://localhost:9090/api/payment_methods')
+    $.ajax(`${server}/api/payment_methods`)
       .done((data) => {
         data.forEach((paymentMethod) => {
           const $paymentMethod = $(paymentMethodRadioTemplate);
@@ -69,14 +212,12 @@ $(() => {
       })
       .fail(handleAJAXError);
     // loading products
-
-    $('.shopping-cart').hide();
   });
 
   $pageContent.css(('padding-top'), $('.navbar').outerHeight());
 
   //  read categories
-  $.ajax('http://localhost:9090/api/categories')
+  $.ajax(`${server}/api/categories`)
     .done((categories) => {
       //  populate carousel with categories
       const $carousel = mkCarousel(categories);
@@ -94,7 +235,7 @@ $(() => {
     .fail(handleAJAXError);
 
   //  ajax req and append products grid
-  $.ajax('http://localhost:9090/api/products')
+  $.ajax(`${server}/api/products`)
     .done((products) => {
       //  append products-grid after carousel
       $pageContent
@@ -104,7 +245,7 @@ $(() => {
       $('#products-grid').append('<div class="row"></div>');
       refreshProducts(products, '-1');
       // click event handler on nav-links
-      $('.nav-link').click((eventObj) => {
+      $('navbar-nav .nav-item').click((eventObj) => {
         eventObj.preventDefault();
         const { target } = eventObj;
         const linkName = target.getAttribute('data-id');
@@ -120,8 +261,9 @@ $(() => {
   // Add a random active user ID
 
   // Select an active user by his id and storage the data as an object in the localStorage
+  /*
   function selectActiveUser(id) {
-    $.ajax(`http://localhost:9090/api/customers/${id}`)
+    $.ajax(`${server}/api/customers/${id}`)
       .done((user) => {
         const userInfo = {
           id: user[0].id,
@@ -138,7 +280,7 @@ $(() => {
   }
 
   // make a query for all the active users in our shop
-  $.ajax('http://localhost:9090/api/activecustomers')
+  $.ajax(`${server}/api/activecustomers`)
     .done((userIDs) => {
       const arrayIDs = [];
       userIDs.forEach((id) => {
@@ -156,4 +298,5 @@ $(() => {
 
   localStorage.removeItem('User');
   // End
+  */
 });

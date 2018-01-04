@@ -5,8 +5,8 @@ const cors = require('cors');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
 const app = express();
+const mailnotifier = require('./mailnotifer');
 const Router = express.Router;
-
 
 const port = 9090;
 
@@ -94,6 +94,16 @@ apiRouter.get('/payment_methods', (req, res) => {
   });
 });
 
+apiRouter.get('/orders', (req, res) => {
+  con.query('SELECT * FROM orders', (err, rows) => {
+    if (err) {
+      throw err;
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
 apiRouter.put('/activate/:userid', (req, res) => {
   con.query('UPDATE customers set active = ? where id = ?', [req.body.status, req.params.userid],
     (err, rows) => {
@@ -134,26 +144,37 @@ apiRouter.post('/user', (req, res) => {
 //postOrder.sh
 apiRouter.post('/order', (req, res) => {
   /*
-  fs.writeFile(path.resolve(__dirname, './../../orders/orders'+Date.now()+'.txt'), JSON.stringify(req.body),
-    (err)=>{
-      if(err)
-        res.json({error: err});
-      res.json({success:'order saved'})
-    });
-    */
-  con.query('INSERT INTO orders (customer_id,created,payment_method_id) VALUES (?,now(),?)', [req.body.customer_id, req.body.payment_method_id],
+    fs.writeFile(path.resolve(__dirname, './../../orders/orders'+Date.now()+'.txt'), JSON.stringify(req.body),
+      (err)=>{
+        if(err)
+          res.json({error: err});
+        res.json({success:'order saved'})
+      });
+  */
+  con.query('INSERT INTO orders (customer_id,created,payment_method_id) VALUES (?,now(),?)', [req.body.user.customer_id, req.body.payment_method_id],
     (err, rows) => {
       if (err) {
         throw err;
       } else {
-        con.query('INSERT INTO order_details (order_id,product_id,price) VALUES (' + rows.insertId + ',?,?)', [req.body.product_id, req.body.price],
-          (err, rows) => {
-            if (err) {
-              throw err;
-            } else {
-              res.json(rows);
-            }
-          });
+        const orderID = rows.insertId;
+        let sql = 'INSERT INTO order_details (order_id,product_id,price) VALUES ';
+        for (let i = 0; i < req.body.products.length; i += 1) {
+          const p = req.body.products[i];
+          let values = '(' + orderID + ',' + p.id + ',' + p.price + ')';
+          sql += values;
+          if (i < req.body.products.length - 1) {
+            sql += ','
+          }
+        }
+        con.query(sql, (err, rows) => {
+          // email stuff
+          const text = `<h1>Thank you ${req.body.user.name}</h1>
+            <p>You need to pay ${req.body.total_price} Euros.</p>
+            <p>Enjoy your miserable day</p>`;
+          const  subject = 'Your shopping list';
+          mailnotifier.sendMail(req.body.user.customer_email, subject, text)
+          return res.json(rows);
+        });
       }
     });
 });

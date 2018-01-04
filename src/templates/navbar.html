@@ -1,10 +1,8 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-  <a class="navbar-brand" href="#">MyShop</a>
-
+  <a class="navbar-brand" href="localhost">MyShop</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
-
   <div class="collapse navbar-collapse" id="navbar">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
@@ -12,33 +10,79 @@
       </li>
     </ul>
   </div>
-
-<!--   <form class="form-inline">
+  <!--   <form class="form-inline">
     <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
     <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
   </form> -->
-
-   <div class="right">
+  <div class="right">
+    <ul class="usertools-nav">
+      <li class="user">
+        <a class="nav-link active usertools-button" href="#"><i class="fa fa-user" aria-hidden="true"></i> Here goes username</a>
+    </ul>
+    <ul class="logout-nav">
+      <li class="user">
+        <a class="nav-link active logout-button" href="#"><i class="fa fa-sign-in" aria-hidden="true"></i> Logout</a>
+    </ul>
+    <ul class="register-nav">
+      <li class="user">
+        <a class="nav-link active register-button" href="#"><i class="fa fa-user" aria-hidden="true"></i> Register</a>
+    </ul>
+    <ul class="login-nav">
+      <li class="user">
+        <a class="nav-link active login-button" href="#"><i class="fa fa-sign-in" aria-hidden="true"></i> Login</a>
+    </ul>
     <ul class="shopping-nav">
       <li class="cart">
         <a href="#" id="cart" class="cart"><i class="fa fa-shopping-cart"></i> Cart <span class="badge">0</span></a>
     </ul>
-    </div> 
+  </div>
 </nav>
-
-
-  <div class="shopping-cart">
-    <div class="shopping-cart-header">
-      <i class="fa fa-shopping-cart cart-icon"></i>Total products: <span class="badge">0</span>
-      <div class="shopping-cart-total">
-        <span class="lighter-text">Total price:</span>
-        <span class="total"></span>
-      </div>
-    </div> <!--end shopping-cart-header -->
-
-    <ul class="shopping-cart-items">
-    </ul>
-
-    <button type="button" class="btn btn-dark btn-block checkout-proceed">Checkout</button>
-    <button type="button" class="btn btn-danger emptyCart btn-block">Remove all products</button>
-  </div> <!--end shopping-cart -->
+<!--login form -->
+<div class="user-login">
+  <form class="form-signin">
+    <h2 class="form-signin-heading">Sign in</h2>
+    <label for="inputEmail" class="sr-only">Email address</label>
+    <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required>
+    <label for="inputPassword" class="sr-only">Username</label>
+    <input type="text" id="inputUsername" class="form-control" placeholder="Username" required>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+    <a href="#" id="new-registation" class="new-registation">
+      <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Not Registered yet? Create an account!
+    </a>
+  </form>
+</div>
+<!--login form -->
+<!--Registation form -->
+<div class="user-register">
+  <form class="form-register">
+    <h2 class="form-register-heading">Register</h2>
+    <input type="text" id="inputFirstname" class="form-control" placeholder="Firstname" required>
+    <input type="text" id="inputLastname" class="form-control" placeholder="Lastname" required>
+    <input type="date" id="inputDate" class="form-control" required>
+    <input type="text" id="inputStreet" class="form-control" placeholder="Street" required>
+    <input type="text" id="inputCity" class="form-control" placeholder="City" required>
+    <input type="text" id="inputPostal" class="form-control" placeholder="Postal" required>
+    <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required>
+    <label for="inputEmail" class="sr-only">Email address</label>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Register Now</button>
+    <a href="#" id="register" class="register">
+      <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Not Logged yet? Sign In Now!
+    </a>
+  </form>
+</div>
+<!--Registation form -->
+<div class="shopping-cart">
+  <div class="shopping-cart-header">
+    <i class="fa fa-shopping-cart cart-icon"></i>Total products: <span class="badge">0</span>
+    <div class="shopping-cart-total">
+      <span class="lighter-text">Total price:</span>
+      <span class="total"></span>
+    </div>
+  </div>
+  <!--end shopping-cart-header -->
+  <ul class="shopping-cart-items">
+  </ul>
+  <button type="button" class="btn btn-dark btn-block checkout-proceed">Checkout</button>
+  <button type="button" class="btn btn-danger emptyCart btn-block">Remove all products</button>
+</div>
+<!--end shopping-cart -->
