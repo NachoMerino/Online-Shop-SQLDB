@@ -50,7 +50,6 @@ export default function refreshProducts(products, type) {
   $('.detailsButton').click((eventObj) => {
     $.ajax(`${server}/api/products`)
       .done((productIMG) => {
-        // $('.modal-open').css('padding-right', '15px');
         // define obj
         const { target } = eventObj;
         //  replace text with jquery retriving data from dom
