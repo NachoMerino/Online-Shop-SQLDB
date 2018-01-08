@@ -10,8 +10,8 @@ import mkCarousel from './carousel';
 import refreshProducts from './products';
 
 // our server provider address
-const server = 'http://nachoserver:9090';
-// const server = 'http://localhost:9090';
+// const server = 'http://nachoserver:9090';
+const server = 'http://localhost:9090';
 
 //  append navbar
 $(() => {
@@ -298,20 +298,25 @@ $(() => {
   $.ajax(`${server}/api/products`)
     .done((products) => {
       //  append products-grid after carousel
-      $pageContent
-        .append(`<div class="infobox"><h2 id="infos">All products (${Object.keys(products).length})</h2></div>`)
-        .append('<div id="products-grid" class="container-fluid"></div>');
-      //  populate products-grid with products
-      $('#products-grid').append('<div class="row"></div>');
-      refreshProducts(products, '-1');
+      function loadCards() {
+        $pageContent
+          .append(`<div class="infobox"><h2 id="infos">All products (${Object.keys(products).length})</h2></div>`)
+          .append('<div id="products-grid" class="container-fluid"></div>');
+        //  populate products-grid with products
+        $('#products-grid').append('<div class="row"></div>');
+        refreshProducts(products, '-1');
+      }
+      loadCards();
       // click event handler on nav-links
-      $('navbar-nav .nav-item').click((eventObj) => {
+      $('.navbar-nav .nav-item').click((eventObj) => {
         eventObj.preventDefault();
         const { target } = eventObj;
         const linkName = target.getAttribute('data-id');
         $('.navbar-nav .active').removeClass('active');
         $(target).closest('li').addClass('active');
         //  clean the products-grid and update the content
+        $pageContent.empty();
+        loadCards();
         refreshProducts(products, linkName);
       });
     })

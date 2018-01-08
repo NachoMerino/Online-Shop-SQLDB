@@ -2,6 +2,10 @@ import $ from 'jquery';
 import Cart from './cart';
 import cardTemplate from './templates/card-template.html';
 
+// our server provider address
+// const server = 'http://nachoserver:9090';
+const server = 'http://localhost:9090';
+
 //  create product box in grid
 export function mkProductCard(product) {
   const $el = $(cardTemplate);
@@ -44,8 +48,9 @@ export default function refreshProducts(products, type) {
   }
   //  detail button
   $('.detailsButton').click((eventObj) => {
-    $.ajax('http://nachoserver:9090/api/products')
+    $.ajax(`${server}/api/products`)
       .done((productIMG) => {
+        // $('.modal-open').css('padding-right', '15px');
         // define obj
         const { target } = eventObj;
         //  replace text with jquery retriving data from dom
@@ -63,7 +68,7 @@ export default function refreshProducts(products, type) {
     if (loggedUser === null) {
       $('.checkout-proceed').empty().html('<button type="button" class="btn btn-dark btn-block checkout-blocked">You must be logged to continue</button>');
     }
-    $.ajax('http://nachoserver:9090/api/products')
+    $.ajax(`${server}/api/products`)
       .done((localStoragePicture) => {
         //  define obj
         const { target } = eventObj;
