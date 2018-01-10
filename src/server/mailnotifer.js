@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 
+
 function sendMail(recipientAdress, subject, body){
   const nodemailer = require('nodemailer');
 

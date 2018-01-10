@@ -1,5 +1,9 @@
 @import './custom-bootstrap';
 
+.alert{
+  text-align: center;
+}
+
 .card {
   margin-top: $grid-gutter-width * 0.5;
   margin-bottom: $grid-gutter-width * 0.5;
@@ -43,9 +47,6 @@
 
 .bg-light {
   background-color: transparent !important;
-}
-.modal-open{
-  padding:0;
 }
 
 .modal-lorem,
@@ -99,7 +100,7 @@ nav {
 }
 
 #products-grid {
-  position: absolute;
+  // position: absolute;
 }
 
 .shopping-nav {

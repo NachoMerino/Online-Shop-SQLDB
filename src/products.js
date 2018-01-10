@@ -15,10 +15,10 @@ export function mkProductCard(product) {
   // $el.find('.card-img-top').attr('src', `./static/assets/images/0${product.category_id}.jpg`);
   // pict loaded from nachoserver
   $el.find('.card-img-top').attr('src', product.pictures);
-  $el.find('.detailsButton').attr('data-name', `${product.name}`);
-  $el.find('.detailsButton').attr('data-id', `${product.id}`);
-  $el.find('.detailsButton').attr('data-catid', `${product.category_id}`);
-  $el.find('.detailsButton').attr('data-price', `${product.price}`);
+  $el.find('.detailsButton').attr('data-name', product.name);
+  $el.find('.detailsButton').attr('data-id', product.id);
+  $el.find('.detailsButton').attr('data-catid', product.category_id);
+  $el.find('.detailsButton').attr('data-price', product.price);
   return $el;
 }
 //  filter and refresh the products
@@ -58,12 +58,13 @@ export default function refreshProducts(products, type) {
         $('.modal-body').text(`The price of this product is € ${target.getAttribute('data-price')}`);
         $('.modal-total').text(`Total 1x ${target.getAttribute('data-name')} is € ${target.getAttribute('data-price')} (Prod. id: ${target.getAttribute('data-id')})`);
         $('#detailsModal').modal('toggle');
+        // $('#products-grid').css('padding-right', '30px');
       });
   });
   //  add to cart
   $('.addCart').click((eventObj) => {
     $('.user-login, .user-register').hide('slow');
-    const loggedUser = JSON.parse(localStorage.getItem('user'));
+    const loggedUser = JSON.parse(localStorage.getItem('userToken'));
     if (loggedUser === null) {
       $('.checkout-proceed').empty().html('<button type="button" class="btn btn-dark btn-block checkout-blocked">You must be logged to continue</button>');
     }

@@ -29,69 +29,19 @@ $(() => {
 
   const $userLogin = $('.user-login');
   const $userRegister = $('.user-register');
-  const $inputEmail = $('#inputEmail');
+  const $inputEmailLogin = $('#inputEmailLogin');
   const $inputFirstname = $('#inputFirstname');
   const $loginButton = $('.login-button');
   const $registerButton = $('.register-button');
   const $userButton = $('.usertools-button');
   const $logoutButton = $('.logout-button');
   const $shopingCart = $('.shopping-cart');
-
-  function createRandomUser() {
-    // Add a random active user ID
-    // Select an active user by his id and storage the data as an object in the localStorage
-    function selectActiveUser(id) {
-      $.ajax(`${server}/api/customers/${id}`)
-        .done((user) => {
-          const userInfo = {
-            id: user[0].id,
-            firstname: user[0].firstname,
-            lastname: user[0].lastname,
-            email: user[0].email,
-            phone: user[0].phone,
-            city: user[0].city,
-            postal: user[0].postal,
-            street: user[0].street,
-          };
-          localStorage.setItem('user', JSON.stringify(userInfo));
-          // add data to our login boxes
-          $('#inputEmail').val(userInfo.email);
-          $('#inputUsername').val(`${userInfo.firstname} ${userInfo.lastname}`);
-        });
-    }
-    // make a query for all the active users in our shop
-    $.ajax(`${server}/api/activecustomers`)
-      .done((userIDs) => {
-        const arrayIDs = [];
-        userIDs.forEach((id) => {
-          arrayIDs.push(id);
-        });
-        const activeUserID = [];
-        for (let i = 0; i < arrayIDs.length; i += 1) {
-          activeUserID.push(arrayIDs[i].id);
-        }
-        const max = activeUserID.length - 1;
-        const userID = Math.floor(Math.random() * max);
-        // selected one user with a random math of its id
-        selectActiveUser(activeUserID[userID]);
-      });
-  }
-
-  // check if user exist in localstorage
-  const loggedUser = JSON.parse(localStorage.getItem('user'));
-  if (loggedUser !== null) {
-    const user = JSON.parse(localStorage.getItem('user'));
-    $loginButton.hide();
-    $registerButton.hide();
-    $userButton
-      .show()
-      .html(`<i class="fa fa-user" aria-hidden="true"></i> ${user.firstname}`);
-    $logoutButton.show();
-  }
+  const $inputPassword = $('#inputPassword');
 
   $($pageContent).click(() => {
     $userRegister.hide('slow');
     $userLogin.hide('slow');
+    $shopingCart.hide('slow');
   });
 
   // fake register
@@ -102,7 +52,7 @@ $(() => {
       firstname: $('.form-register #inputFirstname').val(),
       lastname: $('.form-register #inputLastname').val(),
       birthdate: $('.form-register #inputDate').val(),
-      email: $('.form-register #inputEmail').val(),
+      email: $('.form-register #inputEmailLogin').val(),
       city: $('.form-register #inputCity').val(),
       postal: $('.form-register #inputPostal').val(),
       street: $('.form-register #inputStreet').val(),
@@ -117,26 +67,69 @@ $(() => {
     $registerButton.hide();
   }));
 
-
-  //  fake login
+  // REAL LOGIN
   $('.form-signin').on('submit', ((e) => {
     e.preventDefault();
-    $userLogin.hide('slow');
-    $('#inputEmail').val('');
-    $('#inputUsername').val('');
-    $loginButton.hide();
-    $registerButton.hide();
-    const user = JSON.parse(localStorage.getItem('user'));
-    $userButton
-      .show()
-      .html(`<i class="fa fa-user" aria-hidden="true"></i> ${user.firstname}`);
-    $logoutButton.show();
+    const userEmail = $inputEmailLogin.val();
+    const userPwd = $inputPassword.val();
+    // sending the post request
+    /* eslint-disable */
+    $.ajax(`${server}/api/login`, {
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          email: userEmail,
+          pwd: userPwd,
+        }),
+      })
+      /* eslint-enable */
+      // success
+      .done((msg) => {
+        if (msg.err === undefined) {
+          $userLogin.hide('slow');
+          $inputEmailLogin.val('');
+          $inputPassword.val('');
+          $loginButton.hide();
+          $registerButton.hide();
+          localStorage.setItem('userToken', JSON.stringify(msg.token));
+          localStorage.setItem('user', JSON.stringify({
+            id: msg.id,
+            firstname: msg.firstname,
+            lastname: msg.lastname,
+            email: msg.email,
+            phone: msg.phone,
+            city: msg.city,
+            postal: msg.postal,
+            street: msg.street,
+          }));
+          $userButton
+            .show()
+            .html(`<i class="fa fa-user" aria-hidden="true"></i> ${msg.firstname}`);
+          $logoutButton.show();
+        } else {
+          $('.alert-danger').remove();
+          $userLogin
+            .append(`<div class="alert alert-danger">
+                  ${msg.err}
+                  </div>`);
+        }
+      })
+      // fail login
+      .fail(() => {
+        $userLogin
+          .append(`<div class="alert alert-danger">
+                  The server crash
+                  </div>`);
+      });
   }));
   $('.login-button, .register').click((e) => {
     e.preventDefault();
-    createRandomUser();
+    // createRandomUser();
+    // fix user because im lazy to write
+    $inputEmailLogin.val('escatman@gmail.com');
+    $inputPassword.val('halloworld');
     $userLogin.toggle('slow');
-    $inputEmail.focus();
+    $inputEmailLogin.focus();
     if ($userRegister.is(':visible')) {
       $userRegister.hide('slow');
     }
@@ -145,18 +138,22 @@ $(() => {
   $logoutButton.click(() => {
     localStorage.removeItem('user');
     localStorage.removeItem('cart');
+    localStorage.removeItem('userToken');
+    localStorage.removeItem('totalPrice');
     $shopingCart.hide();
     $('#cart').hide();
     $logoutButton.hide();
     $userButton.hide();
     $loginButton.show();
     $registerButton.show();
+    // reload the page
+    window.location.reload(true);
   });
 
   $('.signin').click((e) => {
     e.preventDefault();
     $userLogin.toggle('slow');
-    $inputEmail.focus();
+    $inputEmailLogin.focus();
     if ($userRegister.is(':visible')) {
       $userRegister.hide('slow');
     }
@@ -181,7 +178,7 @@ $(() => {
     $shopingCart.toggle('slow');
     $userLogin.hide('slow');
     $userRegister.hide('slow');
-    const checkUserLogged = JSON.parse(localStorage.getItem('user'));
+    const checkUserLogged = JSON.parse(localStorage.getItem('userToken'));
     if (checkUserLogged !== null) {
       $('.checkout-proceed').empty().html('<button type="button" class="btn btn-dark btn-block checkout-proceed">Checkout</button>');
     }
@@ -193,8 +190,7 @@ $(() => {
     if (userLogged === null) {
       $shopingCart.hide('slow');
       $userLogin.toggle('slow');
-      createRandomUser();
-      $inputEmail.focus();
+      $inputEmailLogin.focus();
       return;
     }
     $shopingCart.hide();
@@ -230,11 +226,13 @@ $(() => {
         payment_method_id: $checkout.find('[name="payment"]:checked').val(),
         total_price: totalPrice,
       });
+      /* eslint-disable */
       $.ajax(`${server}/api/order`, {
-        method: 'POST',
-        contentType: 'application/json',
-        data,
-      })
+          method: 'POST',
+          contentType: 'application/json',
+          data,
+        })
+        /* eslint-enable */
         .done(() => {
           $checkout
             .empty()
