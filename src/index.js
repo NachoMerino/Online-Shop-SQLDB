@@ -38,6 +38,7 @@ $(() => {
   const $shopingCart = $('.shopping-cart');
   const $inputPassword = $('#inputPassword');
 
+  // hide the popup content when click outside of it
   $($pageContent).click(() => {
     $userRegister.hide('slow');
     $userLogin.hide('slow');
