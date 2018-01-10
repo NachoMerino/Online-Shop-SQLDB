@@ -9,6 +9,10 @@ import paymentMethodRadioTemplate from './templates/payment-method-radio.html';
 import mkCarousel from './carousel';
 import refreshProducts from './products';
 
+/* eslint-disable */
+const bcrypt = require('bcryptjs');
+/* eslint-enable */
+
 // our server provider address
 // const server = 'http://nachoserver:9090';
 const server = 'http://localhost:9090';
@@ -73,55 +77,62 @@ $(() => {
     e.preventDefault();
     const userEmail = $inputEmailLogin.val();
     const userPwd = $inputPassword.val();
+    let userHash = 'randomhash';
     // sending the post request
     /* eslint-disable */
-    $.ajax(`${server}/api/login`, {
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({
-          email: userEmail,
-          pwd: userPwd,
-        }),
-      })
-      /* eslint-enable */
-      // success
-      .done((msg) => {
-        if (msg.err === undefined) {
-          $userLogin.hide('slow');
-          $inputEmailLogin.val('');
-          $inputPassword.val('');
-          $loginButton.hide();
-          $registerButton.hide();
-          localStorage.setItem('userToken', JSON.stringify(msg.token));
-          localStorage.setItem('user', JSON.stringify({
-            id: msg.id,
-            firstname: msg.firstname,
-            lastname: msg.lastname,
-            email: msg.email,
-            phone: msg.phone,
-            city: msg.city,
-            postal: msg.postal,
-            street: msg.street,
-          }));
-          $userButton
-            .show()
-            .html(`<i class="fa fa-user" aria-hidden="true"></i> ${msg.firstname}`);
-          $logoutButton.show();
-        } else {
-          $('.alert-danger').remove();
-          $userLogin
-            .append(`<div class="alert alert-danger">
+    bcrypt.hash(userPwd, 10, (err, hash) => {
+      userHash = hash;
+      $.ajax(`${server}/api/login`, {
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({
+            email: userEmail,
+            pwd: userHash,
+          }),
+        })
+        /* eslint-enable */
+        // success
+        .done((msg) => {
+          if (msg.err === undefined) {
+            $userLogin.hide('slow');
+            $inputEmailLogin.val('');
+            $inputPassword.val('');
+            $loginButton.hide();
+            $registerButton.hide();
+            localStorage.setItem('userToken', JSON.stringify(msg.token));
+            localStorage.setItem('user', JSON.stringify({
+              id: msg.id,
+              firstname: msg.firstname,
+              lastname: msg.lastname,
+              email: msg.email,
+              phone: msg.phone,
+              city: msg.city,
+              postal: msg.postal,
+              street: msg.street,
+            }));
+            $userButton
+              .show()
+              .html(`<i class="fa fa-user" aria-hidden="true"></i> ${msg.firstname}`);
+            $logoutButton.show();
+          } else {
+            $('.alert-danger').remove();
+            $userLogin
+              .append(`<div class="alert alert-danger">
                   ${msg.err}
                   </div>`);
-        }
-      })
-      // fail login
-      .fail(() => {
-        $userLogin
-          .append(`<div class="alert alert-danger">
+          }
+        })
+        // fail login
+        .fail(() => {
+          $userLogin
+            .append(`<div class="alert alert-danger">
                   The server crash
                   </div>`);
-      });
+        });
+      if (err) {
+        throw err;
+      }
+    });
   }));
   $('.login-button, .register').click((e) => {
     e.preventDefault();

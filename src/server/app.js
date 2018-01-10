@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const mailnotifier = require('./mailnotifer');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const serverSignature = 'Super_Secret_Signature';
 const Router = express.Router;
 
@@ -139,28 +140,34 @@ apiRouter.post('/login', (req, res) => {
   if (!req.body.email || !req.body.pwd) {
     return res.json({ err: 'Mail and password required' });
   }
-  con.query('select * from customers where email = ? and pwd = ?', [req.body.email, req.body.pwd],
+
+  con.query('select * from customers where email = ?', [req.body.email],
     function(err, rows) {
       console.log()
       if (err) {
         throw err;
       }
+      console.log(rows);
       if (rows.length > 0) {
-        if (rows[0].email === req.body.email && rows[0].pwd === req.body.pwd) {
-          const token = jwt.sign({ email: rows[0].email, pwd: rows[0].pwd }, serverSignature);
-          return res.json({
-            firstname: rows[0].firstname,
-            token: token,
-            id: rows[0].id,
-            firstname: rows[0].firstname,
-            lastname: rows[0].lastname,
-            email: rows[0].email,
-            phone: rows[0].phone,
-            city: rows[0].city,
-            postal: rows[0].postal,
-            street: rows[0].street,
-          });
-        }
+        bcrypt.compare(rows[0].pwd, req.body.pwd, (err, responseHash) => {
+          if (responseHash) {
+            const token = jwt.sign({ email: rows[0].email, pwd: rows[0].pwd }, serverSignature);
+            return res.json({
+              firstname: rows[0].firstname,
+              token: token,
+              id: rows[0].id,
+              firstname: rows[0].firstname,
+              lastname: rows[0].lastname,
+              email: rows[0].email,
+              phone: rows[0].phone,
+              city: rows[0].city,
+              postal: rows[0].postal,
+              street: rows[0].street,
+            });
+          } else {
+            return res.json({ err: 'Mail/Password not found' });
+          }
+        })
       } else {
         return res.json({ err: 'Mail/Password not found' });
       }
