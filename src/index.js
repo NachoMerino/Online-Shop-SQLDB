@@ -185,6 +185,7 @@ $(() => {
       .empty()
       .append(`<div>Ajax Error categories: ${error}</div>`);
   }
+
   $('#cart').click(((e) => {
     e.preventDefault();
     $shopingCart.toggle('slow');

@@ -147,27 +147,20 @@ apiRouter.post('/login', (req, res) => {
       if (err) {
         throw err;
       }
-      console.log(rows);
-      if (rows.length > 0) {
-        bcrypt.compare(rows[0].pwd, req.body.pwd, (err, responseHash) => {
-          if (responseHash) {
-            const token = jwt.sign({ email: rows[0].email, pwd: rows[0].pwd }, serverSignature);
-            return res.json({
-              firstname: rows[0].firstname,
-              token: token,
-              id: rows[0].id,
-              firstname: rows[0].firstname,
-              lastname: rows[0].lastname,
-              email: rows[0].email,
-              phone: rows[0].phone,
-              city: rows[0].city,
-              postal: rows[0].postal,
-              street: rows[0].street,
-            });
-          } else {
-            return res.json({ err: 'Mail/Password not found' });
-          }
-        })
+      if (rows.length > 0 && bcrypt.compareSync(rows[0].pwd, req.body.pwd)) {
+        const token = jwt.sign({ email: rows[0].email, pwd: rows[0].pwd }, serverSignature);
+        return res.json({
+          firstname: rows[0].firstname,
+          token: token,
+          id: rows[0].id,
+          firstname: rows[0].firstname,
+          lastname: rows[0].lastname,
+          email: rows[0].email,
+          phone: rows[0].phone,
+          city: rows[0].city,
+          postal: rows[0].postal,
+          street: rows[0].street,
+        });
       } else {
         return res.json({ err: 'Mail/Password not found' });
       }
