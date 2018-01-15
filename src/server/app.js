@@ -7,8 +7,9 @@ const bodyParser = require('body-parser');
 const app = express();
 const mailnotifier = require('./mailnotifer');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 const serverSignature = 'Super_Secret_Signature';
+const bcrypt = require('bcrypt');
+const randomstring = require('randomstring');
 const Router = express.Router;
 
 const port = 9090;
@@ -125,15 +126,6 @@ apiRouter.get('/orders', (req, res) => {
     }
   });
 });
-
-apiRouter.put('/activate/:userid', (req, res) => {
-  con.query('UPDATE customers set active = ? where id = ?', [req.body.status, req.params.userid],
-    (err, rows) => {
-      if (err)
-        throw err;
-      res.json(rows);
-    });
-});
 // login with postman!
 
 apiRouter.post('/login', (req, res) => {
@@ -143,7 +135,6 @@ apiRouter.post('/login', (req, res) => {
 
   con.query('select * from customers where email = ?', [req.body.email],
     function(err, rows) {
-      console.log()
       if (err) {
         throw err;
       }
@@ -155,6 +146,7 @@ apiRouter.post('/login', (req, res) => {
           id: rows[0].id,
           firstname: rows[0].firstname,
           lastname: rows[0].lastname,
+          birthdate: rows[0].birthdate,
           email: rows[0].email,
           phone: rows[0].phone,
           city: rows[0].city,
@@ -167,36 +159,70 @@ apiRouter.post('/login', (req, res) => {
     });
 });
 
-
 // postUser.sh
-apiRouter.post('/user', (req, res) => {
-
+apiRouter.post('/register', (req, res) => {
   con.query('select email from customers where email = ?', [req.body.email],
     function(err, rows) {
       if (err)
         throw res.json();
       if (rows.length > 0) {
-        res.json('The email ' + [req.body.email] + ' its already in use.');
+        return res.json({ err: 'The email ' + [req.body.email] + ' its already in use.' });
       } else {
-        con.query('INSERT INTO customers (firstname,lastname,birthdate,phone,city,street,postal,email) VALUES (?,?,?,?,?,?,?,?)', [req.body.firstname,
+        const rndString = randomstring.generate(20);
+        con.query('INSERT INTO customers (firstname,lastname,birthdate,phone,city,street,postal,email,pwd,activationcode) VALUES (?,?,?,?,?,?,?,?,?,?)', [req.body.firstname,
             req.body.lastname,
             req.body.birthdate,
             req.body.phone,
             req.body.city,
             req.body.street,
             req.body.postal,
-            req.body.email
+            req.body.email,
+            req.body.pwd,
+            rndString,
           ],
           (err, rows) => {
             if (err) {
               throw err;
             } else {
-              res.json(rows);
+              return res.json({
+                firstname: req.body.firstname,
+                token: req.body.pwd,
+                id: rows.insertId,
+                birthdate: req.body.birthdate,
+                lastname: req.body.lastname,
+                email: req.body.email,
+                phone: req.body.phone,
+                city: req.body.city,
+                postal: req.body.postal,
+                street: req.body.street,
+              });
             }
           });
+        // email stuff
+        if (shopConfig.mailnotifications === '0') {
+          const userEmail = req.body.email;
+          const text = `<h1>Thank you ${req.body.firstname} ${req.body.lasttname}</h1>
+            <p>This is a linkcode to activate your account:</p>
+            <p><a href="http://localhost:5000/activate=${rndString}">CLICK TO ACTIVATE</p>
+            <p>Enjoy your miserable day</p>`;
+          const subject = 'Your Activation Link';
+          console.log('sending activating link email to customer', userEmail);
+          mailnotifier.sendMail(userEmail, subject, text);
+        }
       }
     });
 });
+
+apiRouter.put('/activate/:activecode', (req, res) => {
+  console.log('activation user with code:', req.params.activecode);
+  con.query('UPDATE customers set active = 1 where activationcode = ?', [req.params.activecode],
+    (err, rows) => {
+      if (err)
+        throw err;
+      res.json(rows);
+    });
+});
+
 //postOrder.sh
 apiRouter.post('/order', (req, res) => {
   /*
@@ -223,7 +249,7 @@ apiRouter.post('/order', (req, res) => {
           }
         }
         con.query(sql, (err, rows) => {
-          if (shopConfig.mailnotifications === '1') {
+          if (shopConfig.mailnotifications === '0') {
             // email stuff
             const text = `<h1>Thank you ${req.body.user.name}</h1>
             <p>You need to pay ${req.body.total_price} Euros.</p>
@@ -237,7 +263,55 @@ apiRouter.post('/order', (req, res) => {
       }
     });
 });
+
 // modifyUser.sh
+apiRouter.put('/user/:userid', (req, res) => {
+  con.query('select pwd from customers where id = ?', [req.body.id],
+    function(err, rows) {
+      if (err) {
+        throw err;
+      }
+      if (rows.length > 0 && bcrypt.compareSync(rows[0].pwd, req.body.pwd)) {
+        var sql = 'UPDATE customers set ';
+        // console.info('user id: ', req.params.userid);
+        var i = 1;
+        var bodyLength = Object.keys(req.body).length;
+        var values = [];
+        for (var field in req.body) {
+          sql += field + ' = ?';
+          if (i < bodyLength)
+            sql += ',';
+          i++;
+          values.push(req.body[field]);
+          // console.info('field is:',field);
+          // console.info('value is:',req.body[field]);
+        }
+        sql += 'where id = ?';
+        values.push(req.params.userid);
+        con.query(sql, values,
+          (err, rows) => {
+            if (err)
+              throw err;
+            console.log(rows);
+            return res.json({
+              firstname: req.body.firstname,
+              token: req.body.pwd,
+              id: req.params.userid,
+              birthdate: req.body.birthdate,
+              lastname: req.body.lastname,
+              email: req.body.email,
+              phone: req.body.phone,
+              city: req.body.city,
+              postal: req.body.postal,
+              street: req.body.street,
+            });
+          });
+      } else {
+        return res.json({ err: 'Password is not correct' });
+      }
+    });
+});
+/* WORKING
 apiRouter.put('/user/:userid', (req, res) => {
   var sql = 'UPDATE customers set ';
   // console.info('user id: ', req.params.userid);
@@ -259,10 +333,22 @@ apiRouter.put('/user/:userid', (req, res) => {
     (err, rows) => {
       if (err)
         throw err;
-      res.json(rows);
+      console.log(rows);
+      return res.json({
+        firstname: req.body.firstname,
+        token: req.body.pwd,
+        id: req.params.userid,
+        birthdate: req.body.birthdate,
+        lastname: req.body.lastname,
+        email: req.body.email,
+        phone: req.body.phone,
+        city: req.body.city,
+        postal: req.body.postal,
+        street: req.body.street,
+      });
     });
 });
-
+*/
 apiRouter.delete('/delete/:userid', (req, res) => {
   con.query('UPDATE customers set deleted = now() where id = ?', [req.params.userid],
     (err, rows) => {

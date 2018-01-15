@@ -1,6 +1,6 @@
 @import './custom-bootstrap';
 
-.alert{
+.alert {
   text-align: center;
 }
 
@@ -297,10 +297,14 @@ nav {
   border-radius: 3px;
   padding: 2em 1em;
   .form-signin,
-  .form-register {
+  .form-register,
+  .form-update {
     max-width: 330px;
     padding: 15px;
     margin: 0 auto;
+    &-heading {
+      margin-bottom: 10px;
+    }
     .checkbox {
       font-weight: 400;
     }
@@ -330,15 +334,12 @@ nav {
       border-top-right-radius: 0;
     }
 
-    .form-register-heading,
-    .form-signin-heading {
-      margin-bottom: 10px;
-    }
     button {
       margin-top: 1em;
     }
   }
 }
-.checkout-blocked{
+
+.checkout-blocked {
   color: red;
 }
