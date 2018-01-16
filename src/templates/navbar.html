@@ -49,10 +49,13 @@
     <a href="#" id="new-registation" class="new-registation">
       <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Not Registered yet? Create an account!
     </a>
+    <a href="#" id="lost-password" class="lost-password">
+      <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Forgot account?
+    </a>
   </form>
 </div>
 <!--login form -->
-<!--Registation/Upgrade form -->
+<!--Registation form -->
 <div class="user-register">
   <form class="form-register">
     <h2 class="form-register-heading">Register</h2>
@@ -71,6 +74,45 @@
   </form>
 </div>
 <!--Registation form -->
+<!--Upgrade form -->
+<div class="user-update">
+  <form class="form-update">
+    <h2 class="form-update-heading">Update</h2>
+    <input type="text" id="updateFirstname" class="form-control" placeholder="Firstname" required>
+    <input type="text" id="updateLastname" class="form-control" placeholder="Lastname" required>
+    <input type="date" id="updateDate" class="form-control" required>
+    <input type="text" id="updateStreet" class="form-control" placeholder="Street" required>
+    <input type="text" id="updateCity" class="form-control" placeholder="City" required>
+    <input type="text" id="updatePostal" class="form-control" placeholder="Postal" required>
+    <input type="email" id="updateEmail" class="form-control" placeholder="Email address" required>
+    <input type="password" id="updatePasswordRegister" class="form-control" placeholder="Password to Confirm Changes" required>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Update</button>
+    <a href="#" id="register" class="register">
+      <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Not Logged yet? Sign In Now!
+    </a>
+  </form>
+</div>
+<!--Upgrade form -->
+<!--Recover password form -->
+<div class="user-lost-password">
+  <form class="form-lostpass">
+    <h2 class="form-lostpass-heading">Find Your Account</h2>
+    <label for="inputEmail" class="sr-only">Please enter your email</label>
+    <input type="email" id="inputEmailRecover" class="form-control" placeholder="Please enter your email" required>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Send Recover Mail</button>
+  </form>
+</div>
+<!--Recover password form -->
+<!--Change the Recover password  -->
+<div class="user-setnew-password">
+  <form class="form-setnew">
+    <h2 class="form-setnew-heading">Set your New Password</h2>
+    <input type="password" id="recoverPassword1" class="form-control" placeholder="Password" required>
+    <input type="password" id="recoverPassword2" class="form-control" placeholder="Password" required>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Set New Password</button>
+  </form>
+</div>
+<!--Change the Recover password  -->
 <div class="shopping-cart">
   <div class="shopping-cart-header">
     <i class="fa fa-shopping-cart cart-icon"></i>Total products: <span class="badge">0</span>

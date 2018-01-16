@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken');
 const serverSignature = 'Super_Secret_Signature';
 const bcrypt = require('bcrypt');
 const randomstring = require('randomstring');
+app.set('view engine', 'ejs');
 const Router = express.Router;
 
 const port = 9090;
@@ -138,7 +139,7 @@ apiRouter.post('/login', (req, res) => {
       if (err) {
         throw err;
       }
-      if (rows.length > 0 && bcrypt.compareSync(rows[0].pwd, req.body.pwd)) {
+      if (rows.length > 0 && bcrypt.compareSync(req.body.pwd, rows[0].pwd)) {
         const token = jwt.sign({ email: rows[0].email, pwd: rows[0].pwd }, serverSignature);
         return res.json({
           firstname: rows[0].firstname,
@@ -158,6 +159,41 @@ apiRouter.post('/login', (req, res) => {
       }
     });
 });
+// recover password
+
+apiRouter.post('/recover', (req, res) => {
+  con.query('select id from customers where email = ?', [req.body.recEmail],
+    function(err, rows) {
+      if (rows.length === 0) {
+        // i think we should not have this
+        return res.json({ err: 'The email ' + [req.body.recEmail] + ' does not exist in our DB' });
+      } else {
+        const rndString = randomstring.generate(20);
+        con.query('INSERT INTO passwordreset (code,email,customerID) VALUES (?,?,?)', [rndString,
+            req.body.recEmail, rows[0].id,
+          ],
+          (err, rows) => {
+            if (err) {
+              throw err;
+            } else {
+              return res.json({ success: 'Ready to change the pass' });
+            }
+          });
+        // email stuff
+        if (shopConfig.mailnotifications === '0') {
+          console.log('Sending recover email to:', req.body.recEmail);
+          const userEmail = req.body.recEmail;
+          const text = `<h1>Proccess to change the password for the account ${req.body.recEmail}</h1>
+            <p>This is a linkcode to recover your password:</p>
+            <p><a href="http://localhost:5000/resetpassword=${rndString}">CLICK TO RECOVER</p>
+            <p>Enjoy your miserable day</p>`;
+          const subject = 'Your Password Recover Link';
+          mailnotifier.sendMail(userEmail, subject, text);
+        }
+      }
+    });
+});
+
 
 // postUser.sh
 apiRouter.post('/register', (req, res) => {
@@ -169,70 +205,109 @@ apiRouter.post('/register', (req, res) => {
         return res.json({ err: 'The email ' + [req.body.email] + ' its already in use.' });
       } else {
         const rndString = randomstring.generate(20);
-        con.query('INSERT INTO customers (firstname,lastname,birthdate,phone,city,street,postal,email,pwd,activationcode) VALUES (?,?,?,?,?,?,?,?,?,?)', [req.body.firstname,
-            req.body.lastname,
-            req.body.birthdate,
-            req.body.phone,
-            req.body.city,
-            req.body.street,
-            req.body.postal,
-            req.body.email,
-            req.body.pwd,
-            rndString,
-          ],
-          (err, rows) => {
-            if (err) {
-              throw err;
-            } else {
-              return res.json({
-                firstname: req.body.firstname,
-                token: req.body.pwd,
-                id: rows.insertId,
-                birthdate: req.body.birthdate,
-                lastname: req.body.lastname,
-                email: req.body.email,
-                phone: req.body.phone,
-                city: req.body.city,
-                postal: req.body.postal,
-                street: req.body.street,
-              });
-            }
-          });
-        // email stuff
-        if (shopConfig.mailnotifications === '0') {
-          const userEmail = req.body.email;
-          const text = `<h1>Thank you ${req.body.firstname} ${req.body.lasttname}</h1>
+        bcrypt.hash(req.body.pwd, 0, (err, pwdHash) => {
+          con.query('INSERT INTO customers (firstname,lastname,birthdate,phone,city,street,postal,email,pwd,activationcode) VALUES (?,?,?,?,?,?,?,?,?,?)', [req.body.firstname,
+              req.body.lastname,
+              req.body.birthdate,
+              req.body.phone,
+              req.body.city,
+              req.body.street,
+              req.body.postal,
+              req.body.email,
+              pwdHash,
+              rndString,
+            ],
+            (err, rows) => {
+              if (err) {
+                throw err;
+              } else {
+                return res.json({
+                  firstname: req.body.firstname,
+                  token: req.body.pwd,
+                  id: rows.insertId,
+                  birthdate: req.body.birthdate,
+                  lastname: req.body.lastname,
+                  email: req.body.email,
+                  phone: req.body.phone,
+                  city: req.body.city,
+                  postal: req.body.postal,
+                  street: req.body.street,
+                });
+              }
+            });
+          // email stuff
+          if (shopConfig.mailnotifications === '0') {
+            const userEmail = req.body.email;
+            const text = `<h1>Thank you ${req.body.firstname} ${req.body.lastname}</h1>
             <p>This is a linkcode to activate your account:</p>
             <p><a href="http://localhost:5000/activate=${rndString}">CLICK TO ACTIVATE</p>
             <p>Enjoy your miserable day</p>`;
-          const subject = 'Your Activation Link';
-          console.log('sending activating link email to customer', userEmail);
-          mailnotifier.sendMail(userEmail, subject, text);
-        }
+            const subject = 'Your Activation Link';
+            mailnotifier.sendMail(userEmail, subject, text);
+          }
+        })
       }
     });
 });
 
 apiRouter.put('/activate/:activecode', (req, res) => {
-  console.log('activation user with code:', req.params.activecode);
   con.query('UPDATE customers set active = 1 where activationcode = ?', [req.params.activecode],
     (err, rows) => {
-      if (err)
-        throw err;
-      res.json(rows);
+      if (rows.affectedRows === 0) {
+        return res.json({ err: 'Your Code is not valid.' });
+      }
+      return res.json(rows);
+
     });
 });
 
-//postOrder.sh
-apiRouter.post('/order', (req, res) => {
-  /*
-    fs.writeFile(path.resolve(__dirname, './../../orders/orders'+Date.now()+'.txt'), JSON.stringify(req.body),
-      (err)=>{
-        if(err)
-          res.json({error: err});
-        res.json({success:'order saved'})
+apiRouter.put('/passwordreset/:passwordresetcode', (req, res) => {
+  con.query('UPDATE passwordreset set reset = now() where code = ?', [req.params.passwordresetcode],
+    (err, rows) => {
+      if (rows.affectedRows === 0) {
+        return res.json({ err: 'Your Code is not valid.' });
+      }
+      bcrypt.hash(req.body.newPassword, 0, (err, pwdHash) => {
+        con.query('select customerID from passwordreset where code = ?', [req.params.passwordresetcode],
+          (err, rows) => {
+            con.query('UPDATE customers set pwd = ? where id = ?', [pwdHash, rows[0].customerID],
+              (err, rows) => {
+                return res.json('Password successfully Changed');
+              });
+          });
       });
-  */
+    });
+});
+
+
+function ensureToken(req, res, next) {
+  const bearerHeader = req.headers['authorization'];
+  if (typeof bearerHeader !== 'undefined') {
+    const bearer = bearerHeader.split(" ");
+    const bearerToken = bearer[1];
+    req.token = bearerToken;
+    next();
+  } else {
+    res.render('nopass', {
+      status: 403
+    });
+    // res.sendStatus(403);
+  }
+}
+
+function isAuthorized(req, res, next) {
+  jwt.verify(req.token, serverSignature, (err, data) => {
+    if (err) {
+      return res.json({ err: 'YOU SHALL NOT PASS!!!! --"Gandalf"' });
+    } else {
+      next();
+    }
+  });
+}
+
+//postOrder.sh
+apiRouter.post('/order', ensureToken, isAuthorized, (req, res) => {
+  console.log('we are on /order');
   con.query('INSERT INTO orders (customer_id,created,payment_method_id) VALUES (?,now(),?)', [req.body.user.customer_id, req.body.payment_method_id],
     (err, rows) => {
       if (err) {
@@ -267,7 +342,7 @@ apiRouter.post('/order', (req, res) => {
 // modifyUser.sh
 apiRouter.put('/user/:userid', (req, res) => {
   con.query('select pwd from customers where id = ?', [req.body.id],
-    function(err, rows) {
+    (err, rows) => {
       if (err) {
         throw err;
       }

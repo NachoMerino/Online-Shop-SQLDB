@@ -56,6 +56,7 @@ export default function refreshProducts(products, type) {
         $('.modal-title').text(`More info about ${target.getAttribute('data-name')}`);
         $('.modal-image').attr('src', `${productIMG[target.getAttribute('data-id')].pictures}`);
         $('.modal-body').text(`The price of this product is € ${target.getAttribute('data-price')}`);
+        $('.modal-text').text(`${productIMG[target.getAttribute('data-id')].description}`);
         $('.modal-total').text(`Total 1x ${target.getAttribute('data-name')} is € ${target.getAttribute('data-price')} (Prod. id: ${target.getAttribute('data-id')})`);
         $('#detailsModal').modal('toggle');
         // $('#products-grid').css('padding-right', '30px');
