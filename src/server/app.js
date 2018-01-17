@@ -341,28 +341,42 @@ apiRouter.post('/order', ensureToken, isAuthorized, (req, res) => {
 
 // modifyUser.sh
 apiRouter.put('/user/:userid', (req, res) => {
-  con.query('select pwd from customers where id = ?', [req.body.id],
+  con.query('select pwd from customers where id = ?', [req.params.userid],
     (err, rows) => {
       if (err) {
         throw err;
       }
-      if (rows.length > 0 && bcrypt.compareSync(rows[0].pwd, req.body.pwd)) {
+      if (rows.length > 0 && bcrypt.compareSync(req.body.oldPwd, rows[0].pwd)) {
+        delete req.body.oldPwd;
         var sql = 'UPDATE customers set ';
         // console.info('user id: ', req.params.userid);
         var i = 1;
         var bodyLength = Object.keys(req.body).length;
         var values = [];
         for (var field in req.body) {
-          sql += field + ' = ?';
-          if (i < bodyLength)
-            sql += ',';
-          i++;
-          values.push(req.body[field]);
+          console.log('the field is:', field);
+          if (field == 'pwd') {
+            sql += field + ' = ?';
+            if (i < bodyLength)
+              sql += ',';
+            i++;
+            const pwdhash = bcrypt.hashSync(req.body.pwd, 0);
+            values.push(pwdhash);
+          } else {
+            sql += field + ' = ?';
+            if (i < bodyLength)
+              sql += ',';
+            i++;
+            values.push(req.body[field]);
+          }
+
           // console.info('field is:',field);
           // console.info('value is:',req.body[field]);
         }
         sql += 'where id = ?';
         values.push(req.params.userid);
+        console.log('sql', sql);
+        console.log('values', values);
         con.query(sql, values,
           (err, rows) => {
             if (err)

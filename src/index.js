@@ -45,10 +45,14 @@ $(() => {
   // BackEnd Error displayed
   function loadError(errdata) {
     $('.alert-danger').remove();
-    $('.user-register, .user-login, .user-lost-password, .user-setnew-password')
+    $('.user-register, .user-login, .user-lost-password, .user-setnew-password, .user-update')
       .append(`<div class="alert alert-danger">
                   ${errdata}
                   </div>`);
+  }
+
+  function removeError() {
+    $('.alert-danger, .alert-success').remove();
   }
 
   // load a modal with a message and a picture
@@ -128,7 +132,7 @@ $(() => {
   const userToken = JSON.parse(localStorage.getItem('userToken'));
 
   // load user data if the user exist in localStorage
-  const checkUserLS = JSON.parse(localStorage.getItem('user'));
+  let checkUserLS = JSON.parse(localStorage.getItem('user'));
   if (checkUserLS !== null) {
     $loginButton.hide();
     $registerButton.hide();
@@ -155,6 +159,7 @@ $(() => {
   // All navbar click events
   // logout
   $logoutButton.click(() => {
+    $userUpdate.hide('slow');
     localStorage.removeItem('user');
     localStorage.removeItem('cart');
     localStorage.removeItem('userToken');
@@ -179,7 +184,8 @@ $(() => {
 
   $userButton.click((e) => {
     e.preventDefault();
-    $userUpdate.toggle();
+    $userUpdate.toggle('slow');
+    removeError();
     $('#register').hide();
     $('#updateFirstname').val(checkUserLS.firstname);
     $('#updateLastname').val(checkUserLS.lastname);
@@ -191,9 +197,10 @@ $(() => {
   });
 
   // Hide login and show recover form
-  $('#lost-password').click((e) => {
+  $('.lost-password').click((e) => {
     e.preventDefault();
     $('.user-login').hide('slow');
+    $('.user-update').hide('slow');
     $userLostPassword.show('slow');
   });
   // LOGIN AND REGISTER BUTTON
@@ -282,42 +289,6 @@ $(() => {
       .fail((data) => { loadError(data.err); });
   }));
 
-  // EDIT user
-  $('.form-update').on('submit', ((e) => {
-    e.preventDefault();
-    /* eslint-disable */
-    $.ajax(`${server}/api/user/${checkUserLS.id}`, {
-        method: 'PUT',
-        contentType: 'application/json',
-        data: JSON.stringify({
-          firstname: $('#updateFirstname').val(),
-          lastname: $('#updateLastname').val(),
-          birthdate: $('#updateDate').val(),
-          email: $('#updateEmail').val(),
-          city: $('#updateCity').val(),
-          postal: $('#updatePostal').val(),
-          street: $('#updateStreet').val(),
-          pwd: $('#updatePasswordRegister').val(),
-        }),
-      })
-      /* eslint-enable */
-      .done((data) => {
-        if (data.err === undefined) {
-          $('.alert-success').remove();
-          $('.form-update')
-            .append(`<div class="alert alert-success" role="alert">
-                    <strong>Well done!</strong> You successfully read this important alert message.
-                    </div>`);
-        } else {
-          loadError(data.err);
-        }
-      })
-      .fail((data) => {
-        loadError(data.err);
-      });
-  }));
-
-
   // USER LOGIN
   $('.form-signin').on('submit', ((e) => {
     e.preventDefault();
@@ -352,6 +323,7 @@ $(() => {
             postal: data.postal,
             street: data.street,
           }));
+          checkUserLS = JSON.parse(localStorage.getItem('user'));
           $userButton
             .show()
             .html(`<i class="fa fa-user" aria-hidden="true"></i> ${data.firstname}`);
@@ -364,6 +336,48 @@ $(() => {
       .fail((data) => {
         loadError(data.err);
       });
+  }));
+
+  // EDIT user
+  $('.form-update').on('submit', ((e) => {
+    e.preventDefault();
+    const pass1 = $('#changePassword1').val();
+    const pass2 = $('#changePassword2').val();
+    if (pass1 !== pass2) {
+      loadError('Passwords must be equal');
+    } else {
+      /* eslint-disable */
+      $.ajax(`${server}/api/user/${checkUserLS.id}`, {
+          method: 'PUT',
+          contentType: 'application/json',
+          data: JSON.stringify({
+            firstname: $('#updateFirstname').val(),
+            lastname: $('#updateLastname').val(),
+            birthdate: $('#updateDate').val(),
+            email: $('#updateEmail').val(),
+            city: $('#updateCity').val(),
+            postal: $('#updatePostal').val(),
+            street: $('#updateStreet').val(),
+            oldPwd: $('#updatePasswordRegister').val(),
+            pwd : pass2,
+          }),
+        })
+        /* eslint-enable */
+        .done((data) => {
+          if (data.err === undefined) {
+            $('.alert-success').remove();
+            $('.form-update')
+              .append(`<div class="alert alert-success" role="alert">
+                    <strong>Well done!</strong> You successfully read this important alert message.
+                    </div>`);
+          } else {
+            loadError(data.err);
+          }
+        })
+        .fail((data) => {
+          loadError(data.err);
+        });
+    }
   }));
 
   // RECOVER PASSWORD
