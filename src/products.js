@@ -25,8 +25,8 @@ export function mkProductCard(product) {
 export default function refreshProducts(products, type) {
   const cart = new Cart();
   // used to force clean during development
-  cart.clear();
-  cart.update();
+  // cart.clear();
+  // cart.update();
   $('#products-grid').empty();
   $('#products-grid').append('<div class="row"></div>');
   const cat = parseInt(type, 10);
@@ -65,6 +65,7 @@ export default function refreshProducts(products, type) {
   //  add to cart
   $('.addCart').click((eventObj) => {
     $('.user-login, .user-register').hide('slow');
+    $('.shopping-cart').hide();
     const loggedUser = JSON.parse(localStorage.getItem('userToken'));
     if (loggedUser === null) {
       $('.checkout-proceed').empty().html('<button type="button" class="btn btn-dark btn-block checkout-blocked">You must be logged to continue</button>');

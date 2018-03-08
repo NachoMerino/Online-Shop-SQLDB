@@ -39,20 +39,41 @@ $(() => {
   const $shopingCart = $('.shopping-cart');
   const $inputPassword = $('#inputPassword');
   const $checkoutProceed = $('.checkout-proceed');
+  const $inputEmail1 = $('#inputEmail2');
+  const $inputEmail2 = $('#inputEmail1');
   const $cart = $('#cart');
   // Webpage loaded
 
+  function removeError() {
+    $('.alert-danger, .alert-success').remove();
+  }
+
   // BackEnd Error displayed
-  function loadError(errdata) {
-    $('.alert-danger').remove();
+  function loadError(errData) {
+    removeError();
     $('.user-register, .user-login, .user-lost-password, .user-setnew-password, .user-update')
       .append(`<div class="alert alert-danger">
-                  ${errdata}
+                  ${errData}
                   </div>`);
   }
 
-  function removeError() {
-    $('.alert-danger, .alert-success').remove();
+  function loadSuccess(succData) {
+    removeError();
+    $('.user-register, .user-login, .user-lost-password, .user-setnew-password, .user-update')
+      .append(`<div class="alert alert-success" role="alert">
+              ${succData}
+              </div>`);
+  }
+
+  // Keyup function to check the emails
+  function keyUpChecker(toCheck1, toCheck2, succMsg, failMsg) {
+    toCheck1.keyup(() => {
+      if (toCheck1.val() !== toCheck2.val()) {
+        loadError(failMsg);
+      } else if (toCheck1.val() === toCheck2.val()) {
+        loadSuccess(succMsg);
+      }
+    });
   }
 
   // load a modal with a message and a picture
@@ -73,6 +94,8 @@ $(() => {
       .empty()
       .append(`<div>Ajax Error categories: ${error}</div>`);
   }
+  // here can be strore all the keyups DOM loaded for the Forms
+  keyUpChecker($inputEmail1, $inputEmail2, 'Mails match', 'Mails should be equal');
 
   // check if there is an activation link incoming
   if (window.location.href.includes('activate')) {
@@ -130,7 +153,7 @@ $(() => {
   }
   // load the LS of the userToken
   const userToken = JSON.parse(localStorage.getItem('userToken'));
-
+  const userCart = JSON.parse(localStorage.getItem('cart'));
   // load user data if the user exist in localStorage
   let checkUserLS = JSON.parse(localStorage.getItem('user'));
   if (checkUserLS !== null) {
@@ -142,6 +165,37 @@ $(() => {
       .html(`<i class="fa fa-user" aria-hidden="true"></i> ${checkUserLS.firstname}`);
   }
 
+  if (userCart !== null) {
+    $cart.show();
+    const sum = [];
+    userCart.forEach((data) => {
+      sum.push(data.quantity);
+    });
+    const totalSum = sum.reduce((a, b) => a + b, 0);
+    $('.badge').text(totalSum);
+    // adding pictures and data
+    /*
+    $.ajax(`${server}/api/products`)
+      .done((localStoragePicture) => {
+        //  define obj
+        const { target } = eventObj;
+        //  define product obj and retriving data using jquery
+        const product = {};
+        product.id = $(target).parent().find('#detailsButton').attr('data-id');
+        product.catid = $(target).parent().find('#detailsButton').attr('data-catid');
+        product.name = $(target).parent().find('#detailsButton').attr('data-name');
+        product.price = $(target).parent().find('#detailsButton').attr('data-price');
+        const pictID = $(target).parent().find('#detailsButton')[0].attributes[6].value;
+        product.pictures = localStoragePicture[pictID].pictures;
+        product.quantity = 1;
+        //  workaround duplication
+        //  $(target).attr('disabled', true);
+        //  add product to cart
+        cart.addItem(product);
+      });
+      */
+  }
+
   // hide the popup content when click outside of it
   $($pageContent).click(() => {
     $userRegister.hide('slow');
@@ -151,7 +205,6 @@ $(() => {
     $userLostPassword.hide('slow');
     $userRegister.hide('slow');
     $userLogin.hide('slow');
-    $shopingCart.hide('slow');
     $userUpdate.hide('slow');
     $userLostPassword.hide('slow');
   });
@@ -184,8 +237,17 @@ $(() => {
 
   $userButton.click((e) => {
     e.preventDefault();
-    $userUpdate.toggle('slow');
     removeError();
+    $userLostPassword.hide('slow');
+    $userUpdate.toggle('slow');
+    $('#changePassword2').hide();
+    $('#changePassword1').keyup(() => {
+      if ($('#changePassword1').val() !== '') {
+        $('#changePassword2').fadeIn('slow');
+      } else if ($('#changePassword1').val() === '') {
+        $('#changePassword2').fadeOut('slow');
+      }
+    });
     $('#register').hide();
     $('#updateFirstname').val(checkUserLS.firstname);
     $('#updateLastname').val(checkUserLS.lastname);
@@ -199,6 +261,7 @@ $(() => {
   // Hide login and show recover form
   $('.lost-password').click((e) => {
     e.preventDefault();
+    removeError();
     $('.user-login').hide('slow');
     $('.user-update').hide('slow');
     $userLostPassword.show('slow');
@@ -206,6 +269,7 @@ $(() => {
   // LOGIN AND REGISTER BUTTON
   $('.login-button, .register').click((e) => {
     e.preventDefault();
+    removeError();
     // fix user because im lazy to write
     $inputEmailLogin.val('escatman@gmail.com');
     $inputPassword.val('qwerty');
@@ -221,6 +285,7 @@ $(() => {
 
   $('.new-registation, .register-button').click((e) => {
     e.preventDefault();
+    removeError();
     $userRegister.toggle('slow');
     $userLostPassword.hide('slow');
     $inputFirstname.focus();
@@ -230,6 +295,7 @@ $(() => {
   });
 
   $cart.click(((e) => {
+    removeError();
     e.preventDefault();
     $shopingCart.toggle('slow');
     $userLogin.hide('slow');
@@ -239,11 +305,10 @@ $(() => {
     }
   }));
 
-  //
-
   // Register Form
   $('.form-register').on('submit', ((e) => {
     e.preventDefault();
+    removeError();
     localStorage.removeItem('user');
     /* eslint-disable */
     $.ajax(`${server}/api/register`, {
@@ -253,7 +318,7 @@ $(() => {
           firstname: $('#inputFirstname').val(),
           lastname: $('#inputLastname').val(),
           birthdate: $('#inputDate').val(),
-          email: $('#inputEmail').val(),
+          email: $('#inputEmail2').val(),
           city: $('#inputCity').val(),
           postal: $('#inputPostal').val(),
           street: $('#inputStreet').val(),
@@ -292,6 +357,7 @@ $(() => {
   // USER LOGIN
   $('.form-signin').on('submit', ((e) => {
     e.preventDefault();
+    removeError();
     // sending the post request
     /* eslint-disable */
     $.ajax(`${server}/api/login`, {
@@ -341,6 +407,7 @@ $(() => {
   // EDIT user
   $('.form-update').on('submit', ((e) => {
     e.preventDefault();
+    removeError();
     const pass1 = $('#changePassword1').val();
     const pass2 = $('#changePassword2').val();
     if (pass1 !== pass2) {
@@ -359,17 +426,13 @@ $(() => {
             postal: $('#updatePostal').val(),
             street: $('#updateStreet').val(),
             oldPwd: $('#updatePasswordRegister').val(),
-            pwd : pass2,
+            pwd: pass2,
           }),
         })
         /* eslint-enable */
         .done((data) => {
           if (data.err === undefined) {
-            $('.alert-success').remove();
-            $('.form-update')
-              .append(`<div class="alert alert-success" role="alert">
-                    <strong>Well done!</strong> You successfully read this important alert message.
-                    </div>`);
+            loadSuccess('Info Updated');
           } else {
             loadError(data.err);
           }
@@ -383,6 +446,7 @@ $(() => {
   // RECOVER PASSWORD
   $('.form-lostpass').on('submit', ((e) => {
     e.preventDefault();
+    removeError();
     /* eslint-disable */
     $.ajax(`${server}/api/recover`, {
         method: 'POST',
@@ -540,9 +604,6 @@ $(() => {
         const linkName = target.getAttribute('data-id');
         $('.navbar-nav .active').removeClass('active');
         $(target).closest('li').addClass('active');
-        //  clean the products-grid and update the content
-        $pageContent.empty();
-        loadCards();
         refreshProducts(products, linkName);
       });
     })

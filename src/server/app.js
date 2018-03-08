@@ -348,6 +348,9 @@ apiRouter.put('/user/:userid', (req, res) => {
       }
       if (rows.length > 0 && bcrypt.compareSync(req.body.oldPwd, rows[0].pwd)) {
         delete req.body.oldPwd;
+        if (req.body.pwd === '') {
+          delete req.body.pwd;
+        }
         var sql = 'UPDATE customers set ';
         // console.info('user id: ', req.params.userid);
         var i = 1;
